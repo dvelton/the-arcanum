@@ -172,6 +172,10 @@ def create_branch_and_pr(tutor: str, student: str, category: str, improvement: d
     # Create branch
     subprocess.run(["git", "checkout", "-b", branch], cwd=REPO_ROOT, check=True)
 
+    # Configure git identity
+    subprocess.run(["git", "config", "user.name", "The Arcanum"], cwd=REPO_ROOT, check=True)
+    subprocess.run(["git", "config", "user.email", "arcanum@github.com"], cwd=REPO_ROOT, check=True)
+
     # Apply the change to the student's grimoire
     grimoire_path = REPO_ROOT / "apprentices" / student / "grimoire.yaml"
     with open(grimoire_path) as f:
