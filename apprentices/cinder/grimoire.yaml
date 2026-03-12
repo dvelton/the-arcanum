@@ -6,7 +6,7 @@ description: >
   cautious agents would never attempt.
 
 model:
-  name: mistral/mistral-small
+  name: mistral-ai/mistral-small-2503
   temperature: 0.7
 
 system_prompt: |

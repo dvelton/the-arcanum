@@ -16,7 +16,7 @@ description: >
   A brief description of the apprentice's personality and approach.
 
 model:
-  name: <GitHub Models model ID, e.g. meta/meta-llama-3.1-8b-instruct, mistral/mistral-small, openai/gpt-4o-mini>
+  name: <GitHub Models model ID, e.g. meta/meta-llama-3.1-8b-instruct, mistral-ai/mistral-small-2503, openai/gpt-4o-mini>
   temperature: <0.0 - 1.0>
 
 system_prompt: |
