@@ -1,0 +1,77 @@
+name: The Chronicle
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  chronicle:
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'office-hours')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate chronicle entry
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          python -c "
+          import json, os
+          from openai import OpenAI
+          from pathlib import Path
+          from datetime import datetime, timezone
+
+          client = OpenAI()
+          title = os.environ.get('PR_TITLE', 'Unknown session')
+          body = os.environ.get('PR_BODY', '')
+
+          prompt = f'''Write a brief narrative (3-5 sentences) about this Office Hours
+          tutoring session at the Arcanum. Make it read like a journal entry from
+          the academy, not a technical report. Be specific about what changed and why.
+
+          PR Title: {title}
+          PR Details: {body}
+
+          Write ONLY the narrative, no headers or metadata.'''
+
+          resp = client.chat.completions.create(
+              model='gpt-4o',
+              messages=[{'role': 'user', 'content': prompt}],
+              temperature=0.7,
+              max_tokens=300,
+          )
+
+          narrative = resp.choices[0].message.content
+          date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+          slug = title.lower().replace(' ', '-')[:60]
+          for ch in ':[](){}':
+              slug = slug.replace(ch, '')
+          filename = f'chronicle/{date}-{slug}.md'
+
+          Path('chronicle').mkdir(exist_ok=True)
+          with open(filename, 'w') as f:
+              f.write(f'# {title}\n\n*{date}*\n\n{narrative}\n')
+
+          print(f'Chronicle entry: {filename}')
+          "
+
+      - name: Commit chronicle entry
+        run: |
+          git config user.name "The Arcanum"
+          git config user.email "arcanum@github.com"
+          git add chronicle/
+          git commit -m "Chronicle: $(date -u +%Y-%m-%d) office hours" || true
+          git push

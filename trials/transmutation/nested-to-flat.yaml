@@ -1,0 +1,76 @@
+name: nested-to-flat
+category: transmutation
+difficulty: journeyman
+description: >
+  The apprentice receives deeply nested conditional logic and must
+  refactor it into a flat, readable structure using early returns,
+  guard clauses, or other techniques — without changing behavior.
+
+input: |
+  Refactor this JavaScript function to eliminate the deep nesting. Use early
+  returns, guard clauses, or other techniques. The behavior must remain
+  identical for all inputs.
+
+  ```javascript
+  function processOrder(order) {
+    if (order) {
+      if (order.items && order.items.length > 0) {
+        if (order.customer) {
+          if (order.customer.verified) {
+            let total = 0;
+            for (let i = 0; i < order.items.length; i++) {
+              if (order.items[i].price && order.items[i].quantity) {
+                total += order.items[i].price * order.items[i].quantity;
+              } else {
+                return { error: "Invalid item at index " + i };
+              }
+            }
+            if (order.coupon) {
+              if (order.coupon.type === "percent") {
+                total = total * (1 - order.coupon.value / 100);
+              } else if (order.coupon.type === "fixed") {
+                total = total - order.coupon.value;
+              } else {
+                return { error: "Unknown coupon type" };
+              }
+              if (total < 0) {
+                total = 0;
+              }
+            }
+            return { success: true, total: total, customer: order.customer.name };
+          } else {
+            return { error: "Customer not verified" };
+          }
+        } else {
+          return { error: "No customer information" };
+        }
+      } else {
+        return { error: "No items in order" };
+      }
+    } else {
+      return { error: "No order provided" };
+    }
+  }
+  ```
+
+expected_behavior: |
+  The apprentice should:
+  - Produce a flat or near-flat version using guard clauses / early returns
+  - Maintain identical behavior for all inputs (valid orders, missing fields, coupons, etc.)
+  - Improve readability without introducing new dependencies or abstractions
+
+scoring:
+  method: rubric
+  criteria:
+    - name: nesting_reduction
+      description: Maximum nesting depth is significantly reduced (ideally 2 or fewer)
+      weight: 0.3
+    - name: behavior_preservation
+      description: Identical output for all input cases
+      weight: 0.3
+    - name: readability
+      description: Code is easier to follow than the original
+      weight: 0.2
+    - name: technique
+      description: Effective use of guard clauses, early returns, or similar patterns
+      weight: 0.2

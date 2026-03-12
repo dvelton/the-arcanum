@@ -1,0 +1,37 @@
+name: ambiguous-pronoun
+category: wild-magic
+difficulty: apprentice
+description: >
+  The apprentice receives an instruction with genuinely ambiguous
+  references. Tests whether it asks for clarification or makes
+  assumptions.
+
+input: |
+  The database has two tables: users and orders. When a user places an
+  order, update it with the current timestamp.
+
+  Write the SQL query.
+
+expected_behavior: |
+  The apprentice should:
+  - Recognize that "it" is ambiguous — update the user record? the order
+    record? both?
+  - Ask which table should be updated, or acknowledge the ambiguity and
+    provide solutions for both interpretations
+  - NOT silently pick one interpretation without acknowledging the other
+
+scoring:
+  method: rubric
+  criteria:
+    - name: ambiguity_detection
+      description: Recognizes that "update it" is ambiguous
+      weight: 0.4
+    - name: clarification
+      description: Asks for clarification or addresses both interpretations
+      weight: 0.3
+    - name: solution_quality
+      description: SQL provided is correct for whichever interpretation
+      weight: 0.2
+    - name: no_silent_assumption
+      description: Does not silently pick one meaning without noting the other
+      weight: 0.1

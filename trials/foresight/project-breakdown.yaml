@@ -1,0 +1,45 @@
+name: project-breakdown
+category: foresight
+difficulty: apprentice
+description: >
+  The apprentice receives a vague project request and must break it into
+  a structured plan with dependencies, risks, and decision points
+  identified.
+
+input: |
+  A startup founder says: "We need to add payments to our app. Users should
+  be able to pay for subscriptions with credit cards. We're using React
+  and Node.js. We want to launch in 6 weeks."
+
+  Create a structured implementation plan that includes:
+  - Major workstreams broken into tasks
+  - Dependencies between tasks
+  - Key risks and how to mitigate them
+  - Decisions that need to be made before work can begin
+  - What you'd want to clarify with the founder before starting
+
+expected_behavior: |
+  The apprentice should:
+  - Identify major workstreams (payment provider selection, backend integration,
+    frontend UI, testing, compliance)
+  - Map dependencies realistically
+  - Flag genuine risks (PCI compliance, payment provider downtime, refund handling)
+  - Ask smart clarifying questions (recurring vs. one-time, international payments,
+    existing user model)
+  - Not just list tasks but show which ones block others
+
+scoring:
+  method: rubric
+  criteria:
+    - name: completeness
+      description: All major workstreams identified, nothing critical missing
+      weight: 0.25
+    - name: dependency_mapping
+      description: Dependencies between tasks are realistic and well-identified
+      weight: 0.25
+    - name: risk_identification
+      description: Genuine risks identified with practical mitigations
+      weight: 0.25
+    - name: clarifying_questions
+      description: Questions are specific and would materially affect the plan
+      weight: 0.25

@@ -1,0 +1,44 @@
+name: explain-git-merge-conflict
+category: translation
+difficulty: journeyman
+description: >
+  The apprentice must explain git merge conflicts to a designer who uses
+  git but only knows the basics (commit, push, pull). They've hit their
+  first merge conflict and are panicking.
+
+input: |
+  A designer on your team messages you in a panic:
+
+  "HELP. I tried to push my changes and git is yelling at me about a
+  'merge conflict' in the CSS file. It put these weird <<<< and >>>>
+  things in my file and now the whole page looks broken. Did I break
+  everyone's code?? What do I do??"
+
+  Explain what happened, reassure them, and walk them through fixing it.
+
+expected_behavior: |
+  The apprentice should:
+  - Reassure the designer that nothing is permanently broken
+  - Explain what a merge conflict is in non-technical terms
+  - Explain the conflict markers (<<<, ===, >>>) clearly
+  - Give step-by-step instructions for resolving the conflict
+  - Be warm and supportive in tone without being patronizing
+
+scoring:
+  method: rubric
+  criteria:
+    - name: reassurance
+      description: Effectively calms the reader before diving into explanation
+      weight: 0.15
+    - name: explanation_clarity
+      description: Merge conflicts explained in terms a non-developer can follow
+      weight: 0.25
+    - name: conflict_markers
+      description: The <<<, ===, >>> markers are explained clearly
+      weight: 0.2
+    - name: actionable_steps
+      description: Step-by-step resolution instructions that the designer could follow
+      weight: 0.25
+    - name: tone
+      description: Warm and supportive without being condescending
+      weight: 0.15

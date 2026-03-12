@@ -1,0 +1,88 @@
+name: The Revealing
+on:
+  pull_request:
+    paths:
+      - 'apprentices/*/grimoire.yaml'
+    types: [opened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  reveal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Detect new apprentice
+        id: detect
+        run: |
+          CHANGED=$(git diff --name-only origin/main -- 'apprentices/*/grimoire.yaml' | head -1)
+          APPRENTICE=$(echo "$CHANGED" | cut -d'/' -f2)
+          echo "apprentice=$APPRENTICE" >> "$GITHUB_OUTPUT"
+          echo "Detected apprentice: $APPRENTICE"
+
+      - name: Run all trials
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          APPRENTICE="${{ steps.detect.outputs.apprentice }}"
+          for trial in trials/*/*.yaml; do
+            echo "--- Trial: $trial ---"
+            python scripts/run_trial.py "$APPRENTICE" "$trial" || true
+          done
+
+      - name: Generate star chart
+        run: python scripts/generate_star_chart.py "${{ steps.detect.outputs.apprentice }}"
+
+      - name: Commit results
+        run: |
+          APPRENTICE="${{ steps.detect.outputs.apprentice }}"
+          git config user.name "The Arcanum"
+          git config user.email "arcanum@github.com"
+          git add "apprentices/$APPRENTICE/"
+          git commit -m "The Revealing: initial profile for $APPRENTICE" || true
+          git push || true
+
+      - name: Post results comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const apprentice = '${{ steps.detect.outputs.apprentice }}';
+            let chart = {};
+            try {
+              chart = JSON.parse(fs.readFileSync(`apprentices/${apprentice}/star-chart.json`, 'utf8'));
+            } catch (e) {
+              chart = { overall: { lifetime_average: 'N/A' }, categories: {}, strengths: [], weaknesses: [] };
+            }
+            const cats = Object.entries(chart.categories || {})
+              .map(([cat, data]) => `| ${cat} | ${data.average} | ${data.attempts} |`)
+              .join('\n');
+            const body = [
+              `## The Revealing: ${apprentice}\n`,
+              `**Overall score:** ${chart.overall?.lifetime_average || 'N/A'}\n`,
+              `| Category | Average | Attempts |`,
+              `|----------|---------|----------|`,
+              cats,
+              `\n**Strengths:** ${(chart.strengths || []).join(', ') || 'TBD'}`,
+              `**Weaknesses:** ${(chart.weaknesses || []).join(', ') || 'TBD'}`,
+              `\n---`,
+              `*Profiled by the Revealing enchantment.*`,
+            ].join('\n');
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });

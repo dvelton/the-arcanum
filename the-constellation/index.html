@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Constellation — The Arcanum</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a1a;
+      color: #c8c8d8;
+      font-family: 'Georgia', serif;
+      overflow: hidden;
+    }
+
+    #header {
+      position: fixed;
+      top: 20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    #header h1 {
+      font-size: 1.4rem;
+      font-weight: normal;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #8888aa;
+    }
+
+    #header p {
+      font-size: 0.8rem;
+      color: #555566;
+      margin-top: 4px;
+    }
+
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #tooltip {
+      position: fixed;
+      display: none;
+      background: rgba(15, 15, 35, 0.95);
+      border: 1px solid #333355;
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      max-width: 280px;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    #tooltip .name {
+      font-size: 1.1rem;
+      color: #eee;
+      margin-bottom: 6px;
+    }
+
+    #tooltip .score {
+      color: #aaa;
+      margin-bottom: 8px;
+    }
+
+    #tooltip .categories {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2px 12px;
+      font-size: 0.8rem;
+    }
+
+    #tooltip .cat-name { color: #888; }
+    #tooltip .cat-score { color: #aaa; text-align: right; }
+
+    #legend {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 0.75rem;
+      color: #555566;
+      text-align: right;
+    }
+
+    #legend div { margin-bottom: 3px; }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <h1>The Constellation</h1>
+    <p>Each star is an apprentice. Brightness is performance. Proximity is similarity.</p>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <div id="tooltip">
+    <div class="name"></div>
+    <div class="score"></div>
+    <div class="categories"></div>
+  </div>
+
+  <div id="legend">
+    <div>brightness = overall score</div>
+    <div>size = number of trials completed</div>
+    <div>color = primary specialization</div>
+  </div>
+
+  <script>
+    const CATEGORY_COLORS = {
+      wards:          { r: 120, g: 180, b: 255 },  // blue
+      transmutation:  { r: 180, g: 255, b: 120 },  // green
+      alchemy:        { r: 255, g: 200, b: 80  },  // gold
+      foresight:      { r: 200, g: 120, b: 255 },  // purple
+      translation:    { r: 255, g: 140, b: 140 },  // coral
+      'wild-magic':   { r: 255, g: 100, b: 200 },  // magenta
+    };
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const tooltip = document.getElementById('tooltip');
+
+    let stars = [];
+    let backgroundStars = [];
+    let mouse = { x: -1000, y: -1000 };
+
+    function resize() {
+      canvas.width = window.innerWidth * devicePixelRatio;
+      canvas.height = window.innerHeight * devicePixelRatio;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+      generateBackgroundStars();
+    }
+
+    function generateBackgroundStars() {
+      backgroundStars = [];
+      const count = Math.floor((window.innerWidth * window.innerHeight) / 3000);
+      for (let i = 0; i < count; i++) {
+        backgroundStars.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          size: Math.random() * 1.2,
+          alpha: Math.random() * 0.4 + 0.1,
+          twinkleSpeed: Math.random() * 0.02 + 0.005,
+          twinklePhase: Math.random() * Math.PI * 2,
+        });
+      }
+    }
+
+    function getStarColor(chart) {
+      const cats = chart.categories || {};
+      let best = null;
+      let bestScore = -1;
+      for (const [cat, data] of Object.entries(cats)) {
+        if (data.average > bestScore) {
+          bestScore = data.average;
+          best = cat;
+        }
+      }
+      return CATEGORY_COLORS[best] || { r: 200, g: 200, b: 220 };
+    }
+
+    async function loadStarCharts() {
+      // In production, this would fetch from the repo
+      // For now, try to load from a known list of apprentices
+      const apprentices = ['wren', 'cinder', 'thorn'];
+      const charts = [];
+
+      for (const name of apprentices) {
+        try {
+          const resp = await fetch(`../apprentices/${name}/star-chart.json`);
+          if (resp.ok) {
+            charts.push(await resp.json());
+          } else {
+            // Generate placeholder data for visualization demo
+            charts.push(generatePlaceholder(name));
+          }
+        } catch {
+          charts.push(generatePlaceholder(name));
+        }
+      }
+
+      return charts;
+    }
+
+    function generatePlaceholder(name) {
+      const profiles = {
+        wren:   { foresight: 0.85, transmutation: 0.78, wards: 0.6,  alchemy: 0.45, translation: 0.7, 'wild-magic': 0.4 },
+        cinder: { alchemy: 0.82,  'wild-magic': 0.75,   foresight: 0.4, wards: 0.35,  transmutation: 0.55, translation: 0.6 },
+        thorn:  { wards: 0.9,     'wild-magic': 0.8,    translation: 0.35, alchemy: 0.4, foresight: 0.6, transmutation: 0.65 },
+      };
+
+      const cats = profiles[name] || {};
+      const scores = Object.values(cats);
+      const avg = scores.length ? scores.reduce((a, b) => a + b) / scores.length : 0.5;
+
+      return {
+        apprentice: name,
+        overall: { lifetime_average: avg, total_trials: Math.floor(Math.random() * 20) + 5, trend: 'stable' },
+        categories: Object.fromEntries(
+          Object.entries(cats).map(([k, v]) => [k, { average: v, attempts: Math.floor(Math.random() * 8) + 2 }])
+        ),
+        strengths: Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 2).map(e => e[0]),
+        weaknesses: Object.entries(cats).sort((a, b) => a[1] - b[1]).slice(0, 2).map(e => e[0]),
+      };
+    }
+
+    function positionStars(charts) {
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      const spread = Math.min(cx, cy) * 0.5;
+
+      return charts.map((chart, i) => {
+        const angle = (i / charts.length) * Math.PI * 2 - Math.PI / 2;
+        const distance = spread * (0.6 + Math.random() * 0.4);
+
+        const color = getStarColor(chart);
+        const score = chart.overall?.lifetime_average || 0.5;
+        const trials = chart.overall?.total_trials || 1;
+
+        return {
+          chart,
+          x: cx + Math.cos(angle) * distance,
+          y: cy + Math.sin(angle) * distance,
+          targetX: cx + Math.cos(angle) * distance,
+          targetY: cy + Math.sin(angle) * distance,
+          size: Math.max(3, Math.min(12, trials * 0.5)),
+          brightness: score,
+          color,
+          pulsePhase: Math.random() * Math.PI * 2,
+          driftAngle: Math.random() * Math.PI * 2,
+          driftSpeed: 0.0003 + Math.random() * 0.0005,
+          driftRadius: 2 + Math.random() * 4,
+        };
+      });
+    }
+
+    function draw(time) {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+      // Background stars
+      for (const s of backgroundStars) {
+        const twinkle = Math.sin(time * s.twinkleSpeed + s.twinklePhase) * 0.15 + s.alpha;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200, 200, 230, ${twinkle})`;
+        ctx.fill();
+      }
+
+      // Apprentice stars
+      for (const star of stars) {
+        const pulse = Math.sin(time * 0.002 + star.pulsePhase) * 0.15 + 1;
+        const drift = time * star.driftSpeed;
+        const dx = Math.cos(drift + star.driftAngle) * star.driftRadius;
+        const dy = Math.sin(drift + star.driftAngle) * star.driftRadius;
+        const x = star.targetX + dx;
+        const y = star.targetY + dy;
+        star.x = x;
+        star.y = y;
+
+        const { r, g, b } = star.color;
+        const alpha = 0.3 + star.brightness * 0.7;
+        const size = star.size * pulse;
+
+        // Glow
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, size * 4);
+        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${alpha * 0.4})`);
+        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+        ctx.beginPath();
+        ctx.arc(x, y, size * 4, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Core
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        ctx.fill();
+
+        // Bright center
+        ctx.beginPath();
+        ctx.arc(x, y, size * 0.4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.8})`;
+        ctx.fill();
+
+        // Label
+        ctx.font = '11px Georgia';
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha * 0.7})`;
+        ctx.textAlign = 'center';
+        ctx.fillText(star.chart.apprentice, x, y + size + 16);
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    function showTooltip(star) {
+      const el = tooltip;
+      el.style.display = 'block';
+      el.style.left = (star.x + 20) + 'px';
+      el.style.top = (star.y - 20) + 'px';
+
+      el.querySelector('.name').textContent = star.chart.apprentice;
+      el.querySelector('.score').textContent =
+        `Overall: ${(star.chart.overall?.lifetime_average || 0).toFixed(3)} | ` +
+        `${star.chart.overall?.total_trials || 0} trials | ` +
+        `${star.chart.overall?.trend || 'new'}`;
+
+      const catsEl = el.querySelector('.categories');
+      catsEl.innerHTML = '';
+      for (const [cat, data] of Object.entries(star.chart.categories || {})) {
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'cat-name';
+        nameDiv.textContent = cat;
+        const scoreDiv = document.createElement('div');
+        scoreDiv.className = 'cat-score';
+        scoreDiv.textContent = (data.average || 0).toFixed(2);
+        catsEl.appendChild(nameDiv);
+        catsEl.appendChild(scoreDiv);
+      }
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+
+      let hovered = null;
+      for (const star of stars) {
+        const dx = mouse.x - star.x;
+        const dy = mouse.y - star.y;
+        if (Math.sqrt(dx * dx + dy * dy) < star.size + 10) {
+          hovered = star;
+          break;
+        }
+      }
+
+      if (hovered) {
+        canvas.style.cursor = 'pointer';
+        showTooltip(hovered);
+      } else {
+        canvas.style.cursor = 'default';
+        tooltip.style.display = 'none';
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      resize();
+      if (stars.length) {
+        const charts = stars.map(s => s.chart);
+        stars = positionStars(charts);
+      }
+    });
+
+    async function init() {
+      resize();
+      const charts = await loadStarCharts();
+      stars = positionStars(charts);
+      requestAnimationFrame(draw);
+    }
+
+    init();
+  </script>
+</body>
+</html>

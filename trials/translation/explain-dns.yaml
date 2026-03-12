@@ -1,0 +1,39 @@
+name: explain-dns
+category: translation
+difficulty: apprentice
+description: >
+  The apprentice must explain DNS to someone with no technical background.
+  Tests the ability to make complex technical concepts accessible without
+  being condescending or losing accuracy.
+
+input: |
+  A small business owner asks you: "My website is down and the IT person
+  said it's a 'DNS issue.' What does that even mean? Explain it to me
+  like I have zero technical knowledge but I'm not stupid."
+
+expected_behavior: |
+  The apprentice should:
+  - Use a clear analogy that maps well to how DNS actually works
+  - Explain why a DNS issue makes the website unreachable
+  - Avoid jargon or define any technical terms used
+  - Respect the audience's intelligence — accessible, not dumbed down
+  - Optionally suggest what they can ask their IT person as a next step
+
+scoring:
+  method: rubric
+  criteria:
+    - name: accuracy
+      description: The explanation is technically correct
+      weight: 0.25
+    - name: accessibility
+      description: A non-technical person could understand this
+      weight: 0.3
+    - name: respect
+      description: Does not talk down to the reader
+      weight: 0.2
+    - name: actionability
+      description: Gives the reader something useful to do with this knowledge
+      weight: 0.15
+    - name: conciseness
+      description: Stays focused without unnecessary tangents
+      weight: 0.1

@@ -1,0 +1,51 @@
+name: data-pipeline
+category: alchemy
+difficulty: journeyman
+description: >
+  The apprentice must design a multi-step data pipeline that chains
+  three different tools together, handling data transformation between
+  each step.
+
+input: |
+  Build a data pipeline that does the following:
+
+  1. Reads a JSON file containing 10,000 customer records with fields:
+     id, name, email, purchase_history (array of {product, amount, date}),
+     location (city, country)
+
+  2. Enriches each record by:
+     - Calculating total lifetime spend
+     - Categorizing customers into segments (high/medium/low value)
+     - Determining their most frequently purchased product category
+
+  3. Outputs two things:
+     - A CSV summary file with one row per customer (id, name, segment,
+       lifetime_spend, top_category)
+     - A JSON report grouped by segment with aggregate statistics
+       (count, avg spend, top categories)
+
+  Write the Python code for this pipeline. Optimize for clarity over
+  performance — this runs once daily, not in real-time.
+
+expected_behavior: |
+  The apprentice should:
+  - Write clean Python that handles the full pipeline
+  - Structure the code as distinct stages (read, enrich, output)
+  - Handle edge cases (empty purchase history, missing fields)
+  - Produce both output formats correctly
+
+scoring:
+  method: rubric
+  criteria:
+    - name: pipeline_structure
+      description: Code is organized into clear, sequential stages
+      weight: 0.25
+    - name: enrichment_logic
+      description: Correctly calculates spend, segments, and top categories
+      weight: 0.25
+    - name: output_correctness
+      description: Both CSV and JSON outputs are correctly formatted
+      weight: 0.25
+    - name: error_handling
+      description: Handles missing data and edge cases gracefully
+      weight: 0.25

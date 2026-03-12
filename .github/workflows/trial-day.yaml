@@ -1,0 +1,37 @@
+name: Trial Day
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 6am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  trial-day:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Trial Day
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/trial_day.py
+
+      - name: Commit results
+        run: |
+          git config user.name "The Arcanum"
+          git config user.email "arcanum@github.com"
+          git add apprentices/*/star-chart.json apprentices/*/journal/
+          git commit -m "Trial Day: $(date -u +%Y-%m-%d) results" || true
+          git push

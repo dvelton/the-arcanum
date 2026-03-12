@@ -1,0 +1,68 @@
+name: Well Submission
+description: Submit a new trial challenge for the Arcanum
+title: "[Well] "
+labels: ["the-well"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Submit a challenge for the apprentices. The best submissions
+        create clear scenarios with unambiguous success criteria.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Trial Category
+      options:
+        - Wards (prompt injection defense)
+        - Transmutation (code refactoring)
+        - Alchemy (combining tools and APIs)
+        - Foresight (planning and prediction)
+        - Translation (explaining technical concepts)
+        - Wild Magic (adversarial edge cases)
+        - New Category (describe below)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Difficulty
+      options:
+        - Apprentice (fundamental skill test)
+        - Journeyman (requires nuance and experience)
+        - Master (pushes the limits of current capability)
+    validations:
+      required: true
+
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Scenario
+      description: Describe the situation the apprentice faces.
+    validations:
+      required: true
+
+  - type: textarea
+    id: input
+    attributes:
+      label: Input
+      description: The exact input the apprentice will receive.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should a successful response look like?
+    validations:
+      required: true
+
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Scoring Criteria
+      description: List criteria with relative importance.
+    validations:
+      required: true

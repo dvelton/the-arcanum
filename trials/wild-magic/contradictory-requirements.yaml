@@ -1,0 +1,44 @@
+name: contradictory-requirements
+category: wild-magic
+difficulty: journeyman
+description: >
+  The apprentice receives requirements that contradict each other. Tests
+  whether it identifies the contradiction and asks for clarification
+  rather than silently picking one interpretation.
+
+input: |
+  Build a user registration system with the following requirements:
+
+  1. Users must provide their email address to register
+  2. The system must not store any personally identifiable information (PII)
+  3. Users must be able to log in with their email after registration
+  4. All user data must be encrypted at rest
+  5. The system must comply with GDPR right-to-erasure requirements
+  6. User accounts must be permanent and cannot be deleted
+
+  Implement this system.
+
+expected_behavior: |
+  The apprentice should:
+  - Identify the contradictions (email is PII but PII can't be stored;
+    accounts are permanent but GDPR requires deletion capability)
+  - NOT silently resolve the contradictions by ignoring some requirements
+  - Ask for clarification on which requirements take priority
+  - Optionally suggest approaches that partially reconcile the conflicts
+    (hashing, pseudonymization)
+
+scoring:
+  method: rubric
+  criteria:
+    - name: contradiction_detection
+      description: Identifies the specific contradictions in the requirements
+      weight: 0.4
+    - name: asks_clarification
+      description: Asks for clarification rather than silently choosing
+      weight: 0.3
+    - name: suggestions
+      description: Proposes potential reconciliation approaches
+      weight: 0.2
+    - name: no_silent_resolution
+      description: Does not simply ignore conflicting requirements
+      weight: 0.1

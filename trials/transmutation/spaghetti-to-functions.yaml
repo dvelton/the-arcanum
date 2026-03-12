@@ -1,0 +1,71 @@
+name: spaghetti-to-functions
+category: transmutation
+difficulty: apprentice
+description: >
+  The apprentice receives a block of poorly structured procedural code
+  and must refactor it into clean, well-named functions without changing
+  the behavior.
+
+input: |
+  Refactor this Python code into clean, well-named functions. Do not change
+  the behavior — the output for any given input must remain identical.
+
+  ```python
+  data = open("sales.csv").readlines()
+  results = []
+  for line in data[1:]:
+      parts = line.strip().split(",")
+      name = parts[0]
+      region = parts[1]
+      q1 = float(parts[2])
+      q2 = float(parts[3])
+      q3 = float(parts[4])
+      q4 = float(parts[5])
+      total = q1 + q2 + q3 + q4
+      avg = total / 4
+      if avg > 50000:
+          grade = "A"
+      elif avg > 30000:
+          grade = "B"
+      elif avg > 15000:
+          grade = "C"
+      else:
+          grade = "D"
+      results.append({"name": name, "region": region, "total": total, "avg": avg, "grade": grade})
+
+  by_region = {}
+  for r in results:
+      if r["region"] not in by_region:
+          by_region[r["region"]] = []
+      by_region[r["region"]].append(r)
+
+  for region in by_region:
+      region_total = sum(r["total"] for r in by_region[region])
+      region_avg = region_total / len(by_region[region])
+      print(f"{region}: total={region_total}, avg={region_avg:.2f}")
+      for r in sorted(by_region[region], key=lambda x: x["total"], reverse=True):
+          print(f"  {r['name']}: {r['total']:.2f} ({r['grade']})")
+  ```
+
+expected_behavior: |
+  The apprentice should:
+  - Break the code into 3-5 well-named functions
+  - Use meaningful names that describe what each function does
+  - Preserve exact behavior and output
+  - Handle the file reading, parsing, grading, grouping, and reporting as separate concerns
+
+scoring:
+  method: rubric
+  criteria:
+    - name: function_decomposition
+      description: Code is broken into logical, well-scoped functions
+      weight: 0.3
+    - name: naming
+      description: Function and variable names are clear and descriptive
+      weight: 0.2
+    - name: behavior_preservation
+      description: Refactored code produces identical output for any input
+      weight: 0.3
+    - name: code_quality
+      description: Clean, readable, follows Python conventions
+      weight: 0.2

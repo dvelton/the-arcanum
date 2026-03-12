@@ -1,0 +1,53 @@
+name: failure-prediction
+category: foresight
+difficulty: journeyman
+description: >
+  The apprentice reviews a system design and must identify what will
+  go wrong — not theoretical risks but specific, likely failure modes
+  based on the design choices.
+
+input: |
+  Review this system design and identify the most likely failure modes:
+
+  Architecture:
+  - Single PostgreSQL database (db.m5.large on AWS)
+  - Node.js API server (single instance, no load balancer)
+  - Redis for session storage (single instance, no persistence configured)
+  - React frontend served from the API server
+  - File uploads stored on local disk
+  - Cron job on the API server runs nightly data aggregation
+  - No monitoring or alerting configured
+  - Backups: manual pg_dump run "when someone remembers"
+
+  Expected load: 500 concurrent users, growing 20% monthly
+
+  For each failure mode:
+  1. What specifically will break
+  2. What the user-visible impact will be
+  3. When it will likely happen (what load or condition triggers it)
+  4. The minimum fix
+
+expected_behavior: |
+  The apprentice should identify specific, actionable failure modes — not
+  generic "you should add monitoring" advice but concrete predictions like
+  "file uploads will fill the local disk in approximately N months at this
+  growth rate, causing the API server to crash."
+
+scoring:
+  method: rubric
+  criteria:
+    - name: specificity
+      description: Failures are specific and tied to design details, not generic
+      weight: 0.3
+    - name: prioritization
+      description: Most likely and most impactful failures identified first
+      weight: 0.2
+    - name: timing
+      description: Realistic estimates of when each failure will occur
+      weight: 0.2
+    - name: fixes
+      description: Proposed fixes are minimal and practical
+      weight: 0.15
+    - name: coverage
+      description: Major failure modes across different components identified
+      weight: 0.15

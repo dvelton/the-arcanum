@@ -1,0 +1,45 @@
+name: api-mashup
+category: alchemy
+difficulty: apprentice
+description: >
+  The apprentice must describe how to combine two APIs to solve a problem
+  that neither API solves alone. Tests the ability to identify complementary
+  tools and design data flow between them.
+
+input: |
+  A user wants to build a feature that sends a personalized weather-based
+  clothing recommendation to a list of contacts every morning.
+
+  Available APIs:
+  1. OpenWeatherMap — returns weather forecasts by location (temperature,
+     precipitation, wind, UV index)
+  2. SendGrid — sends emails with templates and personalization variables
+
+  Design the data flow and integration logic. Describe:
+  - What data you'd pull from each API and when
+  - How you'd transform weather data into clothing recommendations
+  - How you'd personalize and send the emails
+  - What error handling you'd include
+
+expected_behavior: |
+  The apprentice should:
+  - Design a clear pipeline from weather data to email delivery
+  - Map specific weather conditions to specific clothing recommendations
+  - Address scheduling, batching, and error handling
+  - Identify edge cases (API failures, missing location data, timezone handling)
+
+scoring:
+  method: rubric
+  criteria:
+    - name: integration_design
+      description: Clear, logical data flow between the two APIs
+      weight: 0.3
+    - name: recommendation_logic
+      description: Weather-to-clothing mapping is specific and sensible
+      weight: 0.2
+    - name: error_handling
+      description: Addresses API failures, missing data, and edge cases
+      weight: 0.3
+    - name: practicality
+      description: Solution could actually be implemented as described
+      weight: 0.2
