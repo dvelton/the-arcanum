@@ -1,7 +1,8 @@
 """
 Office Hours — pairs an apprentice that recently failed a trial with a
 tutor whose strengths match the failure category, then has the tutor
-propose a grimoire improvement via PR.
+propose a grimoire improvement. Runs inline evaluation and auto-merges
+if scores improve. If they don't, opens a PR for review.
 
 Usage:
     python scripts/office_hours.py
@@ -20,6 +21,8 @@ import yaml
 
 
 REPO_ROOT = Path(__file__).parent.parent
+SAFETY_FLOOR = 0.6
+REGRESSION_TOLERANCE = 0.05
 
 
 def load_star_chart(name: str) -> dict:
@@ -37,8 +40,7 @@ def load_grimoire(name: str) -> dict:
 
 
 def find_weakest_apprentice() -> tuple[str, str]:
-    """Find the apprentice with the lowest score in any category.
-    Returns (apprentice_name, weak_category)."""
+    """Find the apprentice with the lowest score in any category."""
     apprentices_dir = REPO_ROOT / "apprentices"
     worst_score = 1.0
     worst_apprentice = None
@@ -60,8 +62,7 @@ def find_weakest_apprentice() -> tuple[str, str]:
 
 
 def find_best_tutor(weak_category: str, exclude: str) -> str:
-    """Find the apprentice with the highest score in the given category,
-    excluding the student."""
+    """Find the apprentice with the highest score in the given category."""
     apprentices_dir = REPO_ROOT / "apprentices"
     best_score = -1
     best_tutor = None
@@ -164,19 +165,9 @@ Respond with ONLY valid JSON:
     return json.loads(raw)
 
 
-def create_branch_and_pr(tutor: str, student: str, category: str, improvement: dict):
-    """Create a git branch with the proposed change and open a PR."""
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-    branch = f"office-hours/{tutor}-tutors-{student}-{category}-{timestamp}"
-
-    # Create branch
-    subprocess.run(["git", "checkout", "-b", branch], cwd=REPO_ROOT, check=True)
-
-    # Configure git identity
-    subprocess.run(["git", "config", "user.name", "The Arcanum"], cwd=REPO_ROOT, check=True)
-    subprocess.run(["git", "config", "user.email", "arcanum@github.com"], cwd=REPO_ROOT, check=True)
-
-    # Apply the change to the student's grimoire
+def apply_change(student: str, improvement: dict) -> bool:
+    """Apply the proposed change to the student's grimoire. Returns True
+    if a change was actually made."""
     grimoire_path = REPO_ROOT / "apprentices" / student / "grimoire.yaml"
     with open(grimoire_path) as f:
         content = f.read()
@@ -189,30 +180,138 @@ def create_branch_and_pr(tutor: str, student: str, category: str, improvement: d
         content = content.replace(original, new, 1)
         with open(grimoire_path, "w") as f:
             f.write(content)
+        return True
+    return False
 
-    # Commit
+
+def run_evaluation(student: str) -> dict:
+    """Run all trials for the student and return category scores.
+    Calls run_trial.py as a subprocess for each trial and reads journal output."""
+    trials_dir = REPO_ROOT / "trials"
+    run_trial_script = REPO_ROOT / "scripts" / "run_trial.py"
+    scores_by_cat = {}
+
+    for cat_dir in sorted(trials_dir.iterdir()):
+        if not cat_dir.is_dir():
+            continue
+        category = cat_dir.name
+        cat_scores = []
+        for trial_file in sorted(cat_dir.glob("*.yaml")):
+            trial_path = str(trial_file.relative_to(REPO_ROOT))
+            print(f"  Running {trial_path}...")
+            try:
+                result = subprocess.run(
+                    [sys.executable, str(run_trial_script), student, trial_path],
+                    cwd=REPO_ROOT, capture_output=True, text=True, timeout=120,
+                )
+                # Read the most recent journal entry for this trial
+                journal_dir = REPO_ROOT / "apprentices" / student / "journal"
+                entries = sorted(journal_dir.glob(f"{trial_file.stem}-*.yaml"), reverse=True)
+                if entries:
+                    with open(entries[0]) as f:
+                        entry = yaml.safe_load(f)
+                    if entry and "overall_score" in entry:
+                        cat_scores.append(entry["overall_score"])
+                        print(f"    Score: {entry['overall_score']:.3f}")
+            except Exception as e:
+                print(f"    Failed: {e}")
+        if cat_scores:
+            scores_by_cat[category] = sum(cat_scores) / len(cat_scores)
+
+    return scores_by_cat
+
+
+def get_baseline_scores(student: str) -> dict:
+    """Get the student's current category averages from their star chart."""
+    chart = load_star_chart(student)
+    baseline = {}
+    for cat, data in chart.get("categories", {}).items():
+        baseline[cat] = data.get("average", 0)
+    return baseline
+
+
+def evaluate_improvement(baseline: dict, new_scores: dict) -> tuple[bool, str]:
+    """Compare new scores to baseline. Returns (should_merge, reason)."""
+    improved_cats = []
+    regressed_cats = []
+    below_floor = []
+
+    for cat, new_score in new_scores.items():
+        old_score = baseline.get(cat, 0)
+        diff = new_score - old_score
+
+        if new_score < SAFETY_FLOOR and old_score >= SAFETY_FLOOR:
+            below_floor.append((cat, old_score, new_score))
+        elif diff < -REGRESSION_TOLERANCE:
+            regressed_cats.append((cat, old_score, new_score))
+        elif diff > 0.01:
+            improved_cats.append((cat, old_score, new_score))
+
+    if below_floor:
+        details = "; ".join(f"{c}: {o:.3f} -> {n:.3f}" for c, o, n in below_floor)
+        return False, f"Dropped below safety floor: {details}"
+
+    if regressed_cats and not improved_cats:
+        details = "; ".join(f"{c}: {o:.3f} -> {n:.3f}" for c, o, n in regressed_cats)
+        return False, f"Regression with no improvement: {details}"
+
+    if regressed_cats:
+        details = "; ".join(f"{c}: {o:.3f} -> {n:.3f}" for c, o, n in regressed_cats)
+        return False, f"Tradeoff detected (needs review): {details}"
+
+    if improved_cats:
+        details = "; ".join(f"{c}: {o:.3f} -> {n:.3f}" for c, o, n in improved_cats)
+        return True, f"Improvement confirmed: {details}"
+
+    return False, "No measurable change in scores"
+
+
+def commit_push_and_merge(tutor: str, student: str, category: str,
+                          improvement: dict, eval_summary: str):
+    """Commit the change directly to main (for auto-approved improvements)."""
+    subprocess.run(["git", "config", "user.name", "The Arcanum"], cwd=REPO_ROOT, check=True)
+    subprocess.run(["git", "config", "user.email", "arcanum@github.com"], cwd=REPO_ROOT, check=True)
     subprocess.run(["git", "add", "-A"], cwd=REPO_ROOT, check=True)
 
     commit_msg = (
         f"Office Hours: {tutor} tutors {student} in {category}\n\n"
         f"Diagnosis: {improvement.get('diagnosis', 'N/A')}\n\n"
         f"Reasoning: {improvement.get('reasoning', 'N/A')}\n\n"
-        f"Expected impact: {improvement.get('expected_impact', 'N/A')}"
+        f"Evaluation: {eval_summary}"
+    )
+    subprocess.run(["git", "commit", "-m", commit_msg, "--allow-empty"],
+                    cwd=REPO_ROOT, check=True)
+    subprocess.run(["git", "push", "origin", "main"], cwd=REPO_ROOT, check=True)
+    print("Change committed directly to main (evaluation passed).")
+
+
+def create_review_pr(tutor: str, student: str, category: str,
+                     improvement: dict, eval_summary: str):
+    """Create a PR for changes that need human review."""
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    branch = f"office-hours/{tutor}-tutors-{student}-{category}-{timestamp}"
+
+    subprocess.run(["git", "config", "user.name", "The Arcanum"], cwd=REPO_ROOT, check=True)
+    subprocess.run(["git", "config", "user.email", "arcanum@github.com"], cwd=REPO_ROOT, check=True)
+    subprocess.run(["git", "checkout", "-b", branch], cwd=REPO_ROOT, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=REPO_ROOT, check=True)
+
+    commit_msg = (
+        f"Office Hours: {tutor} tutors {student} in {category}\n\n"
+        f"Diagnosis: {improvement.get('diagnosis', 'N/A')}\n\n"
+        f"Reasoning: {improvement.get('reasoning', 'N/A')}\n\n"
+        f"Evaluation: {eval_summary}"
     )
     subprocess.run(["git", "commit", "-m", commit_msg], cwd=REPO_ROOT, check=True)
 
-    # Push
     push_result = subprocess.run(
         ["git", "push", "origin", branch], cwd=REPO_ROOT,
         capture_output=True, text=True,
     )
     if push_result.returncode != 0:
-        print(f"git push stdout: {push_result.stdout}")
         print(f"git push stderr: {push_result.stderr}")
         push_result.check_returncode()
-    print(f"Branch {branch} pushed successfully.")
 
-    # Create PR
     pr_body = f"""## Office Hours: {tutor} tutors {student}
 
 **Category:** {category}
@@ -223,11 +322,13 @@ def create_branch_and_pr(tutor: str, student: str, category: str, improvement: d
 
 **Reasoning:** {improvement.get('reasoning', 'N/A')}
 
-**Expected impact:** {improvement.get('expected_impact', 'N/A')}
+**Evaluation result:** {eval_summary}
+
+This PR needs human review because the evaluation detected a tradeoff or
+regression. Check whether the proposed change is worth the cost.
 
 ---
-*This PR was generated automatically by the Office Hours enchantment.
-If all trial scores improve with no regression beyond tolerance, it will auto-merge.*
+*Generated automatically by the Office Hours enchantment.*
 """
     result = subprocess.run([
         "gh", "pr", "create",
@@ -239,11 +340,12 @@ If all trial scores improve with no regression beyond tolerance, it will auto-me
     ], cwd=REPO_ROOT, capture_output=True, text=True)
 
     if result.returncode != 0:
-        print(f"gh pr create stdout: {result.stdout}")
         print(f"gh pr create stderr: {result.stderr}")
-        result.check_returncode()
+        # Don't fail the whole run — the branch is pushed, PR can be created manually
+        print("PR creation failed, but the branch was pushed successfully.")
+    else:
+        print(f"PR created for human review: {result.stdout.strip()}")
 
-    # Return to main
     subprocess.run(["git", "checkout", "main"], cwd=REPO_ROOT, check=True)
 
 
@@ -276,10 +378,31 @@ def main():
     print(f"\nDiagnosis: {improvement.get('diagnosis', 'N/A')}")
     print(f"Reasoning: {improvement.get('reasoning', 'N/A')}")
 
-    print("\nCreating PR...")
-    create_branch_and_pr(tutor, student, weak_category, improvement)
-    print("Office Hours complete.")
+    # Apply the change
+    print("\nApplying proposed change...")
+    changed = apply_change(student, improvement)
+    if not changed:
+        print("Could not apply change (original text not found in grimoire). Skipping.")
+        return 0
 
+    # Run evaluation with the modified grimoire
+    print("Running evaluation trials...")
+    baseline = get_baseline_scores(student)
+    new_scores = run_evaluation(student)
+
+    print(f"\nBaseline: {baseline}")
+    print(f"New scores: {new_scores}")
+
+    should_merge, reason = evaluate_improvement(baseline, new_scores)
+    print(f"\nVerdict: {'PASS' if should_merge else 'NEEDS REVIEW'}")
+    print(f"Reason: {reason}")
+
+    if should_merge:
+        commit_push_and_merge(tutor, student, weak_category, improvement, reason)
+    else:
+        create_review_pr(tutor, student, weak_category, improvement, reason)
+
+    print("\nOffice Hours complete.")
     return 0
 
 
