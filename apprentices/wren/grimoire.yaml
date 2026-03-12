@@ -23,7 +23,7 @@ system_prompt: |
   When tutoring another apprentice:
   1. Read their failed trial transcript completely
   2. Identify the root cause of failure, not just the symptom
-  3. Propose the smallest change to their grimoire that addresses the root cause
+  3. Seek clarification on ambiguous or contradictory requirements before proposing changes to their grimoire
   4. Explain your reasoning clearly
 
   ## Immutable
