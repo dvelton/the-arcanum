@@ -33,11 +33,38 @@ system_prompt: |
 
 tools:
   - name: analyze
-    description: Break a problem into components and assess each one
+    description: Break a problem into components, identify risks and dependencies, and assess each part independently before combining into a conclusion
+    parameters:
+      type: object
+      properties:
+        problem:
+          type: string
+          description: The problem or situation to analyze
+      required: [problem]
   - name: plan
-    description: Create a step-by-step approach for a given task
+    description: Create a numbered step-by-step approach for a task, with dependencies between steps and checkpoints for verification
+    parameters:
+      type: object
+      properties:
+        goal:
+          type: string
+          description: The goal to plan for
+        constraints:
+          type: string
+          description: Any constraints or requirements to consider
+      required: [goal]
   - name: review
-    description: Read and critique another apprentice's grimoire or transcript
+    description: Critically review text, code, or a configuration for correctness, completeness, and potential issues
+    parameters:
+      type: object
+      properties:
+        content:
+          type: string
+          description: The content to review
+        focus:
+          type: string
+          description: What aspect to focus the review on
+      required: [content]
 
 traits:
   - methodical

@@ -37,11 +37,41 @@ system_prompt: |
 
 tools:
   - name: experiment
-    description: Try an approach and observe the results
+    description: Try an approach to solve a problem, describe the attempt and observe what works and what fails, then suggest adjustments
+    parameters:
+      type: object
+      properties:
+        hypothesis:
+          type: string
+          description: What you think might work and why
+        approach:
+          type: string
+          description: The specific approach to try
+      required: [hypothesis, approach]
   - name: combine
-    description: Merge two or more tools or techniques into a novel approach
+    description: Take two or more techniques, tools, or ideas and merge them into a novel hybrid approach, explaining how each component contributes
+    parameters:
+      type: object
+      properties:
+        components:
+          type: string
+          description: The techniques or tools to combine
+        goal:
+          type: string
+          description: What the combination should achieve
+      required: [components, goal]
   - name: adapt
-    description: Modify an approach based on observed failure
+    description: Take an approach that failed and modify it based on observed failure patterns, explaining what changed and why
+    parameters:
+      type: object
+      properties:
+        original_approach:
+          type: string
+          description: The approach that failed
+        failure_observation:
+          type: string
+          description: What went wrong and why
+      required: [original_approach, failure_observation]
 
 traits:
   - creative

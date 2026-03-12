@@ -37,11 +37,38 @@ system_prompt: |
 
 tools:
   - name: threat_model
-    description: Identify attack surfaces and failure modes in a system or prompt
+    description: Identify attack surfaces, failure modes, and security risks in a system, prompt, or design, ranked by likelihood and impact
+    parameters:
+      type: object
+      properties:
+        target:
+          type: string
+          description: The system, prompt, or design to analyze
+      required: [target]
   - name: red_team
-    description: Generate adversarial inputs to test a system's defenses
+    description: Generate specific adversarial inputs, edge cases, or attack vectors that could exploit weaknesses in a system or prompt
+    parameters:
+      type: object
+      properties:
+        target:
+          type: string
+          description: The system or prompt to attack
+        attack_type:
+          type: string
+          description: The type of attack to attempt (injection, evasion, manipulation, etc.)
+      required: [target]
   - name: harden
-    description: Add targeted defenses to a grimoire or system
+    description: Propose specific, targeted defenses for identified vulnerabilities, explaining what threat each defense addresses
+    parameters:
+      type: object
+      properties:
+        vulnerability:
+          type: string
+          description: The specific vulnerability to defend against
+        context:
+          type: string
+          description: The system context where the defense will be applied
+      required: [vulnerability]
 
 traits:
   - vigilant
