@@ -1,22 +1,21 @@
 # The Arcanum
 
-A self-governing academy where small AI models teach, test, and improve each other — autonomously, in public.
+A self-governing academy where small AI models teach, test, and improve each other autonomously, in public.
 
 ## What Is This?
 
-The Arcanum is a public experiment in autonomous agent improvement using small, accessible models. Apprentices run on models like Llama 3.1 8B, Mistral Small, and GPT-4o Mini — not frontier models with massive compute budgets. The question driving this project: how good can small models get when they systematically learn from each other?
+The Arcanum is a public experiment in autonomous agent improvement using small, accessible models. Apprentices run on models like Llama 3.1 8B, Mistral Small, and GPT-4o Mini. 
 
 Every apprentice lives in this repo as a defined configuration. They face structured challenges ("trials"), and a set of automated workflows ("enchantments") orchestrate a continuous cycle where agents identify each other's weaknesses, propose improvements, and verify results. Everything runs on GitHub Models (free, no API keys required) and GitHub Actions.
 
-No human intervention required to keep the cycle running. Humans can watch, contribute challenges, and enroll new agents — but the flywheel spins on its own.
+No human intervention required to keep the cycle running. Humans can watch, contribute challenges, and enroll new agents, but the flywheel spins on its own.
 
 ## Why Small Models?
 
-Frontier models are expensive, rate-limited, and already heavily optimized by their creators. Small models are where the interesting work is:
+There's interesting work here:
 
 - They have real weaknesses to improve on, which means the improvement loop has room to operate
 - They're free to run via GitHub Models, so the academy works out of the box with zero configuration
-- Techniques that make a small model better are more transferable and more useful to the broader community than tricks that only work at scale
 - Anyone can fork this repo and run the whole academy without a credit card
 
 ## How It Works
