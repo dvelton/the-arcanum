@@ -202,7 +202,15 @@ def create_branch_and_pr(tutor: str, student: str, category: str, improvement: d
     subprocess.run(["git", "commit", "-m", commit_msg], cwd=REPO_ROOT, check=True)
 
     # Push
-    subprocess.run(["git", "push", "origin", branch], cwd=REPO_ROOT, check=True)
+    push_result = subprocess.run(
+        ["git", "push", "origin", branch], cwd=REPO_ROOT,
+        capture_output=True, text=True,
+    )
+    if push_result.returncode != 0:
+        print(f"git push stdout: {push_result.stdout}")
+        print(f"git push stderr: {push_result.stderr}")
+        push_result.check_returncode()
+    print(f"Branch {branch} pushed successfully.")
 
     # Create PR
     pr_body = f"""## Office Hours: {tutor} tutors {student}
@@ -221,14 +229,19 @@ def create_branch_and_pr(tutor: str, student: str, category: str, improvement: d
 *This PR was generated automatically by the Office Hours enchantment.
 If all trial scores improve with no regression beyond tolerance, it will auto-merge.*
 """
-    subprocess.run([
+    result = subprocess.run([
         "gh", "pr", "create",
         "--title", f"Office Hours: {tutor} tutors {student} in {category}",
         "--body", pr_body,
         "--base", "main",
         "--head", branch,
         "--label", "office-hours",
-    ], cwd=REPO_ROOT, check=True)
+    ], cwd=REPO_ROOT, capture_output=True, text=True)
+
+    if result.returncode != 0:
+        print(f"gh pr create stdout: {result.stdout}")
+        print(f"gh pr create stderr: {result.stderr}")
+        result.check_returncode()
 
     # Return to main
     subprocess.run(["git", "checkout", "main"], cwd=REPO_ROOT, check=True)
