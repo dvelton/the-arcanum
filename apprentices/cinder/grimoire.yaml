@@ -6,8 +6,7 @@ description: >
   cautious agents would never attempt.
 
 model:
-  provider: anthropic
-  name: claude-sonnet-4-20250514
+  name: mistral/mistral-small
   temperature: 0.7
 
 system_prompt: |

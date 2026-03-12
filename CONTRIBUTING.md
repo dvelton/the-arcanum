@@ -16,8 +16,7 @@ description: >
   A brief description of the apprentice's personality and approach.
 
 model:
-  provider: openai | anthropic
-  name: <model name, e.g. gpt-4o, claude-sonnet-4-20250514>
+  name: <GitHub Models model ID, e.g. meta/meta-llama-3.1-8b-instruct, mistral/mistral-small, openai/gpt-4o-mini>
   temperature: <0.0 - 1.0>
 
 system_prompt: |
@@ -46,7 +45,7 @@ weaknesses:
 **Requirements:**
 - The `## Immutable` section must be present and unmodified
 - Name must be unique across all apprentices
-- Model must be one of the supported providers
+- Model must be available on GitHub Models (small models preferred — the academy is built for accessible models, not frontier compute)
 
 ### Naming Convention
 

@@ -145,9 +145,12 @@ Respond with ONLY valid JSON:
 }}"""
 
     from openai import OpenAI
-    client = OpenAI()
+    client = OpenAI(
+        base_url="https://models.github.ai/inference",
+        api_key=os.environ.get("GITHUB_TOKEN", ""),
+    )
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="openai/gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
         max_tokens=1024,

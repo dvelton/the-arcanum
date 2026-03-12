@@ -24,7 +24,7 @@ jobs:
 
       - name: Generate chronicle entry
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
@@ -34,7 +34,10 @@ jobs:
           from pathlib import Path
           from datetime import datetime, timezone
 
-          client = OpenAI()
+          client = OpenAI(
+              base_url='https://models.github.ai/inference',
+              api_key=os.environ.get('GITHUB_TOKEN', ''),
+          )
           title = os.environ.get('PR_TITLE', 'Unknown session')
           body = os.environ.get('PR_BODY', '')
 
@@ -48,7 +51,7 @@ jobs:
           Write ONLY the narrative, no headers or metadata.'''
 
           resp = client.chat.completions.create(
-              model='gpt-4o',
+              model='openai/gpt-4o-mini',
               messages=[{'role': 'user', 'content': prompt}],
               temperature=0.7,
               max_tokens=300,

@@ -33,8 +33,7 @@ jobs:
 
       - name: Run all trials
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           APPRENTICE="${{ steps.detect.outputs.apprentice }}"
           for trial in trials/*/*.yaml; do

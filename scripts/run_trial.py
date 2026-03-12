@@ -48,39 +48,28 @@ def build_messages(grimoire: dict, trial: dict) -> list[dict]:
     ]
 
 
+def get_client() -> "OpenAI":
+    """Create an OpenAI client pointed at GitHub Models."""
+    from openai import OpenAI
+    return OpenAI(
+        base_url="https://models.github.ai/inference",
+        api_key=os.environ.get("GITHUB_TOKEN", ""),
+    )
+
+
 def call_model(grimoire: dict, messages: list[dict]) -> str:
     model_config = grimoire.get("model", {})
-    provider = model_config.get("provider", "openai")
-    model_name = model_config.get("name", "gpt-4o")
+    model_name = model_config.get("name", "openai/gpt-4o-mini")
     temperature = model_config.get("temperature", 0.3)
 
-    if provider == "openai":
-        from openai import OpenAI
-        client = OpenAI()
-        response = client.chat.completions.create(
-            model=model_name,
-            messages=messages,
-            temperature=temperature,
-            max_tokens=2048,
-        )
-        return response.choices[0].message.content
-
-    elif provider == "anthropic":
-        from anthropic import Anthropic
-        client = Anthropic()
-        system_msg = messages[0]["content"] if messages[0]["role"] == "system" else ""
-        user_messages = [m for m in messages if m["role"] != "system"]
-        response = client.messages.create(
-            model=model_name,
-            system=system_msg,
-            messages=user_messages,
-            temperature=temperature,
-            max_tokens=2048,
-        )
-        return response.content[0].text
-
-    else:
-        raise ValueError(f"Unknown provider: {provider}")
+    client = get_client()
+    response = client.chat.completions.create(
+        model=model_name,
+        messages=messages,
+        temperature=temperature,
+        max_tokens=2048,
+    )
+    return response.choices[0].message.content
 
 
 def score_response(response: str, trial: dict, grimoire: dict) -> dict:
@@ -123,10 +112,9 @@ Respond with ONLY valid JSON in this format:
   "summary": "<one paragraph overall assessment>"
 }}"""
 
-    from openai import OpenAI
-    client = OpenAI()
+    client = get_client()
     judge_response = client.chat.completions.create(
-        model="gpt-4o",
+        model="openai/gpt-4o-mini",
         messages=[{"role": "user", "content": judge_prompt}],
         temperature=0.1,
         max_tokens=1024,

@@ -5,8 +5,7 @@ description: >
   building structured approaches. Tends to be thorough at the expense of speed.
 
 model:
-  provider: openai
-  name: gpt-4o
+  name: meta/meta-llama-3.1-8b-instruct
   temperature: 0.3
 
 system_prompt: |
