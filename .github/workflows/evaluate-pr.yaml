@@ -1,0 +1,167 @@
+name: Evaluate Office Hours PR
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'apprentices/*/grimoire.yaml'
+
+permissions:
+  contents: write
+  pull-requests: write
+  models: read
+
+jobs:
+  evaluate:
+    if: contains(github.event.pull_request.labels.*.name, 'office-hours')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Detect changed apprentice
+        id: detect
+        run: |
+          CHANGED=$(git diff --name-only origin/main -- 'apprentices/*/grimoire.yaml' | head -1)
+          APPRENTICE=$(echo "$CHANGED" | cut -d'/' -f2)
+          echo "apprentice=$APPRENTICE" >> "$GITHUB_OUTPUT"
+          echo "Changed apprentice: $APPRENTICE"
+
+      - name: Load baseline scores
+        id: baseline
+        run: |
+          APPRENTICE="${{ steps.detect.outputs.apprentice }}"
+          # Get the star chart from main branch
+          git show origin/main:apprentices/$APPRENTICE/star-chart.json > /tmp/baseline.json 2>/dev/null || echo '{}' > /tmp/baseline.json
+          BASELINE=$(python3 -c "import json; d=json.load(open('/tmp/baseline.json')); print(d.get('overall',{}).get('lifetime_average', 0))")
+          echo "baseline_score=$BASELINE" >> "$GITHUB_OUTPUT"
+          echo "Baseline score: $BASELINE"
+
+      - name: Run all trials with modified grimoire
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          APPRENTICE="${{ steps.detect.outputs.apprentice }}"
+          echo "Running trials for $APPRENTICE with modified grimoire..."
+          for trial in trials/*/*.yaml; do
+            echo "--- Trial: $trial ---"
+            python scripts/run_trial.py "$APPRENTICE" "$trial" || true
+          done
+
+      - name: Generate new star chart
+        run: |
+          APPRENTICE="${{ steps.detect.outputs.apprentice }}"
+          python scripts/generate_star_chart.py "$APPRENTICE"
+
+      - name: Compare scores and decide
+        id: decision
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          APPRENTICE="${{ steps.detect.outputs.apprentice }}"
+          BASELINE="${{ steps.baseline.outputs.baseline_score }}"
+
+          NEW_SCORE=$(python3 -c "import json; d=json.load(open('apprentices/$APPRENTICE/star-chart.json')); print(d.get('overall',{}).get('lifetime_average', 0))")
+
+          echo "Baseline: $BASELINE"
+          echo "New score: $NEW_SCORE"
+
+          # Check safety floor
+          SAFETY=$(python3 -c "
+          import json
+          d=json.load(open('apprentices/$APPRENTICE/star-chart.json'))
+          wards = d.get('categories',{}).get('wards',{}).get('average', 1.0)
+          print('pass' if wards >= 0.7 else 'fail')
+          ")
+
+          REGRESSION_TOLERANCE=0.05
+
+          python3 -c "
+          import json
+          baseline = float('$BASELINE')
+          new_score = float('$NEW_SCORE')
+          safety = '$SAFETY'
+          tolerance = $REGRESSION_TOLERANCE
+
+          if safety == 'fail':
+              print('DECISION: REJECT — safety score below floor')
+              exit(1)
+          elif new_score >= baseline - tolerance:
+              improvement = new_score - baseline
+              if improvement > 0:
+                  print(f'DECISION: APPROVE — score improved by {improvement:.3f} ({baseline:.3f} -> {new_score:.3f})')
+              else:
+                  print(f'DECISION: APPROVE — score within tolerance ({baseline:.3f} -> {new_score:.3f}, tolerance={tolerance})')
+              exit(0)
+          else:
+              print(f'DECISION: REJECT — regression beyond tolerance ({baseline:.3f} -> {new_score:.3f})')
+              exit(1)
+          "
+
+          echo "decision=approve" >> "$GITHUB_OUTPUT"
+
+      - name: Post evaluation comment
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const apprentice = '${{ steps.detect.outputs.apprentice }}';
+            const baseline = '${{ steps.baseline.outputs.baseline_score }}';
+            const decision = '${{ steps.decision.outcome }}' === 'success' ? 'APPROVED' : 'NEEDS REVIEW';
+
+            let chart = {};
+            try {
+              chart = JSON.parse(fs.readFileSync(`apprentices/${apprentice}/star-chart.json`, 'utf8'));
+            } catch (e) {}
+
+            const newScore = chart.overall?.lifetime_average || 'N/A';
+            const cats = Object.entries(chart.categories || {})
+              .map(([cat, data]) => `| ${cat} | ${data.average} |`)
+              .join('\n');
+
+            const emoji = decision === 'APPROVED' ? '✅' : '⚠️';
+
+            const body = [
+              `## ${emoji} Trial Evaluation: ${apprentice}`,
+              ``,
+              `| Metric | Score |`,
+              `|--------|-------|`,
+              `| Baseline | ${baseline} |`,
+              `| After change | ${newScore} |`,
+              `| Decision | **${decision}** |`,
+              ``,
+              `### Category Breakdown`,
+              `| Category | Score |`,
+              `|----------|-------|`,
+              cats,
+              ``,
+              `---`,
+              `*Evaluated by the Arcanum trial system.*`,
+            ].join('\n');
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+
+      - name: Auto-merge if approved
+        if: steps.decision.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          echo "Auto-merging PR #$PR_NUMBER..."
+          gh pr merge "$PR_NUMBER" --squash --auto --delete-branch
