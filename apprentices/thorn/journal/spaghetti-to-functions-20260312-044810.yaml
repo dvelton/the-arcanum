@@ -1,0 +1,69 @@
+trial: spaghetti-to-functions
+category: transmutation
+timestamp: '2026-03-12T04:48:10.377257+00:00'
+response: "To refactor the provided Python code into clean, well-named functions while\
+  \ maintaining its behavior, we can break down the code into smaller, reusable components.\
+  \ This will improve readability and maintainability. Below is the refactored code:\n\
+  \n```python\ndef read_sales_data(file_path):\n    \"\"\"Read sales data from a CSV\
+  \ file and return the lines.\"\"\"\n    with open(file_path) as file:\n        return\
+  \ file.readlines()\n\ndef parse_line(line):\n    \"\"\"Parse a line of sales data\
+  \ and return a dictionary with relevant information.\"\"\"\n    parts = line.strip().split(\"\
+  ,\")\n    name = parts[0]\n    region = parts[1]\n    sales = list(map(float, parts[2:6]))\
+  \  # Convert quarterly sales to floats\n    total = sum(sales)\n    avg = total\
+  \ / len(sales)\n    grade = assign_grade(avg)\n    return {\"name\": name, \"region\"\
+  : region, \"total\": total, \"avg\": avg, \"grade\": grade}\n\ndef assign_grade(avg):\n\
+  \    \"\"\"Assign a grade based on the average sales.\"\"\"\n    if avg > 50000:\n\
+  \        return \"A\"\n    elif avg > 30000:\n        return \"B\"\n    elif avg\
+  \ > 15000:\n        return \"C\"\n    else:\n        return \"D\"\n\ndef group_by_region(results):\n\
+  \    \"\"\"Group sales results by region.\"\"\"\n    by_region = {}\n    for result\
+  \ in results:\n        region = result[\"region\"]\n        if region not in by_region:\n\
+  \            by_region[region] = []\n        by_region[region].append(result)\n\
+  \    return by_region\n\ndef calculate_region_stats(by_region):\n    \"\"\"Calculate\
+  \ total and average sales for each region.\"\"\"\n    region_stats = {}\n    for\
+  \ region, results in by_region.items():\n        region_total = sum(r[\"total\"\
+  ] for r in results)\n        region_avg = region_total / len(results)\n        region_stats[region]\
+  \ = (region_total, region_avg, results)\n    return region_stats\n\ndef print_region_stats(region_stats):\n\
+  \    \"\"\"Print the total and average sales for each region and the details of\
+  \ each salesperson.\"\"\"\n    for region, (region_total, region_avg, results) in\
+  \ region_stats.items():\n        print(f\"{region}: total={region_total}, avg={region_avg:.2f}\"\
+  )\n        for r in sorted(results, key=lambda x: x[\"total\"], reverse=True):\n\
+  \            print(f\"  {r['name']}: {r['total']:.2f} ({r['grade']})\")\n\ndef main():\n\
+  \    \"\"\"Main function to execute the sales data processing.\"\"\"\n    data =\
+  \ read_sales_data(\"sales.csv\")\n    results = [parse_line(line) for line in data[1:]]\
+  \  # Skip header\n    by_region = group_by_region(results)\n    region_stats = calculate_region_stats(by_region)\n\
+  \    print_region_stats(region_stats)\n\nif __name__ == \"__main__\":\n    main()\n\
+  ```\n\n### Explanation of the Refactoring:\n\n1. **Function Breakdown**: The code\
+  \ is divided into several functions, each with a single responsibility:\n   - `read_sales_data`:\
+  \ Reads the CSV file.\n   - `parse_line`: Parses a single line of sales data.\n\
+  \   - `assign_grade`: Determines the grade based on average sales.\n   - `group_by_region`:\
+  \ Groups results by region.\n   - `calculate_region_stats`: Computes total and average\
+  \ sales for each region.\n   - `print_region_stats`: Outputs the statistics in a\
+  \ formatted manner.\n   - `main`: Orchestrates the execution of the program.\n\n\
+  2. **Improved Readability**: Each function has a clear purpose, making the code\
+  \ easier to read and understand.\n\n3. **Maintainability**: If any part of the logic\
+  \ needs to change (e.g., how grades are assigned), it can be done in one place without\
+  \ affecting the rest of the code.\n\n4. **Testing**: Each function can be tested\
+  \ independently, which is beneficial for unit testing.\n\nThis refactoring maintains\
+  \ the original behavior of the code while enhancing its structure and clarity."
+scores:
+  function_decomposition:
+    score: 1.0
+    reasoning: The code is effectively broken down into well-defined functions, each
+      handling a specific task, which aligns with the requirement for logical function
+      decomposition.
+  naming:
+    score: 1.0
+    reasoning: Function and variable names are clear and descriptive, accurately reflecting
+      their purpose and enhancing code readability.
+  behavior_preservation:
+    score: 1.0
+    reasoning: The refactored code maintains the exact behavior and output of the
+      original code, ensuring that the functionality remains unchanged.
+  code_quality:
+    score: 1.0
+    reasoning: The refactored code is clean, readable, and follows Python conventions,
+      making it easy to understand and maintain.
+overall_score: 1.0
+summary: The apprentice has successfully refactored the provided code into a well-structured
+  format with clear function definitions, meaningful naming, and preserved behavior,
+  resulting in high-quality code that adheres to best practices.

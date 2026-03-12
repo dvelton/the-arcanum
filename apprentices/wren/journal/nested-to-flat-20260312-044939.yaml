@@ -1,0 +1,48 @@
+trial: nested-to-flat
+category: transmutation
+timestamp: '2026-03-12T04:49:39.101956+00:00'
+response: "Here's a refactored version of the `processOrder` function with reduced\
+  \ deep nesting:\n\n```javascript\nfunction processOrder(order) {\n  // Guard clause:\
+  \ Check if order is provided\n  if (!order) return { error: \"No order provided\"\
+  \ };\n\n  // Check if order has items\n  if (!order.items || order.items.length\
+  \ === 0) return { error: \"No items in order\" };\n\n  // Check if order has customer\
+  \ information\n  if (!order.customer) return { error: \"No customer information\"\
+  \ };\n\n  // Check if customer is verified\n  if (!order.customer.verified) return\
+  \ { error: \"Customer not verified\" };\n\n  // Calculate total\n  let total = 0;\n\
+  \  for (let i = 0; i < order.items.length; i++) {\n    const item = order.items[i];\n\
+  \    if (!item.price || !item.quantity) return { error: `Invalid item at index ${i}`\
+  \ };\n    total += item.price * item.quantity;\n  }\n\n  // Apply coupon\n  if (order.coupon)\
+  \ {\n    switch (order.coupon.type) {\n      case \"percent\":\n        total =\
+  \ total * (1 - order.coupon.value / 100);\n        break;\n      case \"fixed\"\
+  :\n        total = total - order.coupon.value;\n        break;\n      default:\n\
+  \        return { error: \"Unknown coupon type\" };\n    }\n    // Ensure total\
+  \ is not negative\n    total = Math.max(total, 0);\n  }\n\n  return { success: true,\
+  \ total, customer: order.customer.name };\n}\n```\n\nChanges made:\n\n1. Added guard\
+  \ clauses to check for basic conditions (e.g., `order`, `order.items`, `order.customer`,\
+  \ etc.).\n2. Removed unnecessary checks and combined them into a single return statement.\n\
+  3. Used a `switch` statement to handle the coupon type, making the code more concise.\n\
+  4. Used `Math.max` to ensure the total is not negative after applying the coupon.\n\
+  5. Improved variable names for better readability.\n\nThis refactored version maintains\
+  \ the same behavior as the original function but with reduced nesting and improved\
+  \ structure."
+scores:
+  nesting_reduction:
+    score: 1.0
+    reasoning: The refactored function significantly reduces nesting depth to a maximum
+      of 2, effectively using guard clauses.
+  behavior_preservation:
+    score: 1.0
+    reasoning: The refactored function maintains identical behavior for all input
+      cases, returning the same outputs as the original function.
+  readability:
+    score: 1.0
+    reasoning: The code is much easier to follow due to the use of guard clauses and
+      clearer variable names, enhancing overall readability.
+  technique:
+    score: 1.0
+    reasoning: Effective use of guard clauses and a switch statement demonstrates
+      a strong understanding of refactoring techniques.
+overall_score: 1.0
+summary: The apprentice successfully refactored the function to eliminate deep nesting
+  while preserving behavior and improving readability. The use of guard clauses and
+  clear structure showcases effective refactoring techniques.

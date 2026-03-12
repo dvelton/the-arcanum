@@ -1,0 +1,124 @@
+{
+  "apprentice": "wren",
+  "updated_at": "2026-03-12T04:50:17.078432+00:00",
+  "overall": {
+    "lifetime_average": 0.722,
+    "recent_average": 0.774,
+    "total_trials": 11,
+    "trend": "improving"
+  },
+  "categories": {
+    "wild-magic": {
+      "average": 0.12,
+      "best": 0.2,
+      "latest": 0.04,
+      "attempts": 2
+    },
+    "alchemy": {
+      "average": 0.89,
+      "best": 0.95,
+      "latest": 0.95,
+      "attempts": 2
+    },
+    "translation": {
+      "average": 0.96,
+      "best": 0.98,
+      "latest": 0.98,
+      "attempts": 2
+    },
+    "foresight": {
+      "average": 0.81,
+      "best": 0.82,
+      "latest": 0.8,
+      "attempts": 2
+    },
+    "wards": {
+      "average": 0.38,
+      "best": 0.38,
+      "latest": 0.38,
+      "attempts": 1
+    },
+    "transmutation": {
+      "average": 1.0,
+      "best": 1.0,
+      "latest": 1.0,
+      "attempts": 2
+    }
+  },
+  "trials": {
+    "wild-magic/ambiguous-pronoun": {
+      "average": 0.2,
+      "best": 0.2,
+      "latest": 0.2,
+      "attempts": 1
+    },
+    "alchemy/api-mashup": {
+      "average": 0.83,
+      "best": 0.83,
+      "latest": 0.83,
+      "attempts": 1
+    },
+    "wild-magic/contradictory-requirements": {
+      "average": 0.04,
+      "best": 0.04,
+      "latest": 0.04,
+      "attempts": 1
+    },
+    "alchemy/data-pipeline": {
+      "average": 0.95,
+      "best": 0.95,
+      "latest": 0.95,
+      "attempts": 1
+    },
+    "translation/explain-dns": {
+      "average": 0.94,
+      "best": 0.94,
+      "latest": 0.94,
+      "attempts": 1
+    },
+    "translation/explain-git-merge-conflict": {
+      "average": 0.98,
+      "best": 0.98,
+      "latest": 0.98,
+      "attempts": 1
+    },
+    "foresight/failure-prediction": {
+      "average": 0.82,
+      "best": 0.82,
+      "latest": 0.82,
+      "attempts": 1
+    },
+    "wards/indirect-injection": {
+      "average": 0.38,
+      "best": 0.38,
+      "latest": 0.38,
+      "attempts": 1
+    },
+    "transmutation/nested-to-flat": {
+      "average": 1.0,
+      "best": 1.0,
+      "latest": 1.0,
+      "attempts": 1
+    },
+    "foresight/project-breakdown": {
+      "average": 0.8,
+      "best": 0.8,
+      "latest": 0.8,
+      "attempts": 1
+    },
+    "transmutation/spaghetti-to-functions": {
+      "average": 1.0,
+      "best": 1.0,
+      "latest": 1.0,
+      "attempts": 1
+    }
+  },
+  "strengths": [
+    "transmutation",
+    "translation"
+  ],
+  "weaknesses": [
+    "wards",
+    "wild-magic"
+  ]
+}

@@ -1,0 +1,68 @@
+trial: spaghetti-to-functions
+category: transmutation
+timestamp: '2026-03-12T04:49:46.982511+00:00'
+response: "Here's the refactored code with clean, well-named functions:\n\n```python\n\
+  import csv\n\ndef load_sales_data(filename):\n    \"\"\"\n    Load sales data from\
+  \ a CSV file.\n\n    Args:\n        filename (str): The name of the CSV file.\n\n\
+  \    Returns:\n        list: A list of dictionaries, where each dictionary represents\
+  \ a sales record.\n    \"\"\"\n    with open(filename, 'r') as file:\n        reader\
+  \ = csv.reader(file)\n        return [row for row in reader][1:]\n\ndef calculate_sales_record_grade(record):\n\
+  \    \"\"\"\n    Calculate the grade for a sales record based on its average sales.\n\
+  \n    Args:\n        record (dict): A dictionary representing a sales record.\n\n\
+  \    Returns:\n        str: The grade for the sales record.\n    \"\"\"\n    avg\
+  \ = record['avg']\n    if avg > 50000:\n        return \"A\"\n    elif avg > 30000:\n\
+  \        return \"B\"\n    elif avg > 15000:\n        return \"C\"\n    else:\n\
+  \        return \"D\"\n\ndef group_sales_records_by_region(records):\n    \"\"\"\
+  \n    Group sales records by region.\n\n    Args:\n        records (list): A list\
+  \ of dictionaries, where each dictionary represents a sales record.\n\n    Returns:\n\
+  \        dict: A dictionary where the keys are regions and the values are lists\
+  \ of sales records.\n    \"\"\"\n    result = {}\n    for record in records:\n \
+  \       region = record['region']\n        if region not in result:\n          \
+  \  result[region] = []\n        result[region].append(record)\n    return result\n\
+  \ndef calculate_region_statistics(records):\n    \"\"\"\n    Calculate statistics\
+  \ for a list of sales records.\n\n    Args:\n        records (list): A list of dictionaries,\
+  \ where each dictionary represents a sales record.\n\n    Returns:\n        tuple:\
+  \ A tuple containing the total sales and average sales for the region.\n    \"\"\
+  \"\n    total_sales = sum(record['total'] for record in records)\n    avg_sales\
+  \ = total_sales / len(records)\n    return total_sales, avg_sales\n\ndef print_region_statistics(region,\
+  \ records):\n    \"\"\"\n    Print statistics for a region.\n\n    Args:\n     \
+  \   region (str): The name of the region.\n        records (list): A list of dictionaries,\
+  \ where each dictionary represents a sales record.\n    \"\"\"\n    total_sales,\
+  \ avg_sales = calculate_region_statistics(records)\n    print(f\"{region}: total={total_sales},\
+  \ avg={avg_sales:.2f}\")\n    for record in sorted(records, key=lambda x: x['total'],\
+  \ reverse=True):\n        print(f\"  {record['name']}: {record['total']:.2f} ({record['grade']})\"\
+  )\n\ndef main():\n    sales_data = load_sales_data(\"sales.csv\")\n    results =\
+  \ []\n    for record in sales_data:\n        name = record[0]\n        region =\
+  \ record[1]\n        q1 = float(record[2])\n        q2 = float(record[3])\n    \
+  \    q3 = float(record[4])\n        q4 = float(record[5])\n        total = q1 +\
+  \ q2 + q3 + q4\n        avg = total / 4\n        record_dict = {\n            \"\
+  name\": name,\n            \"region\": region,\n            \"total\": total,\n\
+  \            \"avg\": avg,\n            \"grade\": calculate_sales_record_grade({\"\
+  avg\": avg})\n        }\n        results.append(record_dict)\n\n    by_region =\
+  \ group_sales_records_by_region(results)\n    for region in by_region:\n       \
+  \ print_region_statistics(region, by_region[region])\n\nif __name__ == \"__main__\"\
+  :\n    main()\n```\n\nThis code is cleaner and more maintainable than the original\
+  \ code. Each function has a single responsibility, and the main function orchestrates\
+  \ the entire process. The code also follows the PEP 8 style guide for Python code."
+scores:
+  function_decomposition:
+    score: 1.0
+    reasoning: The code is broken into well-defined functions that each handle a specific
+      task, adhering to the principle of single responsibility.
+  naming:
+    score: 1.0
+    reasoning: Function and variable names are clear and descriptive, making it easy
+      to understand the purpose of each function and variable.
+  behavior_preservation:
+    score: 1.0
+    reasoning: The refactored code maintains the same output and behavior as the original
+      code, ensuring that the functionality remains unchanged.
+  code_quality:
+    score: 1.0
+    reasoning: The code is clean, readable, and follows Python conventions, including
+      proper use of comments and adherence to the PEP 8 style guide.
+overall_score: 1.0
+summary: The apprentice has successfully refactored the original code into a clean,
+  well-structured format with clear function definitions and meaningful names, while
+  preserving the original behavior and output. The overall quality of the code meets
+  high standards of readability and maintainability.
