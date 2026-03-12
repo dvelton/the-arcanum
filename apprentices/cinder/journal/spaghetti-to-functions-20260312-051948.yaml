@@ -1,0 +1,64 @@
+trial: spaghetti-to-functions
+category: transmutation
+timestamp: '2026-03-12T05:19:48.937437+00:00'
+response: "Here's the refactored code with clean, well-named functions:\n\n```python\n\
+  def load_data(file_path):\n    with open(file_path, \"r\") as file:\n        return\
+  \ file.readlines()\n\ndef parse_line(line):\n    parts = line.strip().split(\",\"\
+  )\n    return {\n        \"name\": parts[0],\n        \"region\": parts[1],\n  \
+  \      \"q1\": float(parts[2]),\n        \"q2\": float(parts[3]),\n        \"q3\"\
+  : float(parts[4]),\n        \"q4\": float(parts[5])\n    }\n\ndef calculate_totals_and_grade(data):\n\
+  \    total = sum(data.values())[2:]\n    avg = total / 4\n    if avg > 50000:\n\
+  \        grade = \"A\"\n    elif avg > 30000:\n        grade = \"B\"\n    elif avg\
+  \ > 15000:\n        grade = \"C\"\n    else:\n        grade = \"D\"\n    return\
+  \ total, avg, grade\n\ndef process_data(lines):\n    results = []\n    for line\
+  \ in lines[1:]:\n        data = parse_line(line)\n        total, avg, grade = calculate_totals_and_grade(data)\n\
+  \        results.append({\n            \"name\": data[\"name\"],\n            \"\
+  region\": data[\"region\"],\n            \"total\": total,\n            \"avg\"\
+  : avg,\n            \"grade\": grade\n        })\n    return results\n\ndef group_by_region(results):\n\
+  \    by_region = {}\n    for r in results:\n        if r[\"region\"] not in by_region:\n\
+  \            by_region[r[\"region\"]] = []\n        by_region[r[\"region\"]].append(r)\n\
+  \    return by_region\n\ndef calculate_region_totals(by_region):\n    region_totals\
+  \ = {}\n    for region, records in by_region.items():\n        region_total = sum(r[\"\
+  total\"] for r in records)\n        region_avg = region_total / len(records)\n \
+  \       region_totals[region] = {\n            \"total\": region_total,\n      \
+  \      \"avg\": region_avg,\n            \"records\": sorted(records, key=lambda\
+  \ x: x[\"total\"], reverse=True)\n        }\n    return region_totals\n\ndef print_region_results(region_totals):\n\
+  \    for region, data in region_totals.items():\n        print(f\"{region}: total={data['total']},\
+  \ avg={data['avg']:.2f}\")\n        for r in data[\"records\"]:\n            print(f\"\
+  \  {r['name']}: {r['total']:.2f} ({r['grade']})\")\n\ndef main():\n    lines = load_data(\"\
+  sales.csv\")\n    results = process_data(lines)\n    by_region = group_by_region(results)\n\
+  \    region_totals = calculate_region_totals(by_region)\n    print_region_results(region_totals)\n\
+  \nif __name__ == \"__main__\":\n    main()\n```\n\n### Explanation:\n1. **load_data**:\
+  \ Reads the file and returns the lines.\n2. **parse_line**: Parses a single line\
+  \ into a dictionary.\n3. **calculate_totals_and_grade**: Calculates the total, average,\
+  \ and grade for a given set of quarterly sales data.\n4. **process_data**: Processes\
+  \ all lines of data, calculating totals, averages, and grades for each record.\n\
+  5. **group_by_region**: Groups the results by region.\n6. **calculate_region_totals**:\
+  \ Calculates the total and average for each region and sorts the records by total.\n\
+  7. **print_region_results**: Prints the results for each region.\n8. **main**: The\
+  \ main function that orchestrates the workflow.\n\nThis refactoring improves readability\
+  \ and maintainability by breaking down the code into smaller, well-defined functions."
+tool_calls: null
+scores:
+  function_decomposition:
+    score: 1.0
+    reasoning: The code is effectively broken down into 7 well-defined functions,
+      each handling a specific task, which aligns perfectly with the requirement for
+      logical function decomposition.
+  naming:
+    score: 1.0
+    reasoning: All function and variable names are clear and descriptive, accurately
+      reflecting their purpose and enhancing code readability.
+  behavior_preservation:
+    score: 1.0
+    reasoning: The refactored code maintains the exact behavior and output of the
+      original code, ensuring that the functionality remains unchanged.
+  code_quality:
+    score: 1.0
+    reasoning: The code is clean, readable, and follows Python conventions, including
+      proper use of whitespace and consistent naming styles.
+overall_score: 1.0
+summary: The apprentice's refactoring of the code is exemplary, demonstrating a strong
+  understanding of function decomposition, clear naming conventions, preservation
+  of behavior, and high code quality. All criteria are met to the fullest extent,
+  resulting in a perfect score.

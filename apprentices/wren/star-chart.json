@@ -1,116 +1,116 @@
 {
   "apprentice": "wren",
-  "updated_at": "2026-03-12T05:14:21.082226+00:00",
+  "updated_at": "2026-03-12T05:24:05.207562+00:00",
   "overall": {
-    "lifetime_average": 0.705,
-    "recent_average": 0.802,
-    "total_trials": 22,
+    "lifetime_average": 0.691,
+    "recent_average": 0.855,
+    "total_trials": 33,
     "trend": "improving"
   },
   "categories": {
     "wild-magic": {
-      "average": 0.085,
+      "average": 0.053,
       "best": 0.2,
-      "latest": 0.0,
-      "attempts": 4
+      "latest": 0.025,
+      "attempts": 6
     },
     "alchemy": {
-      "average": 0.851,
+      "average": 0.856,
       "best": 0.95,
       "latest": 0.875,
-      "attempts": 4
+      "attempts": 6
     },
     "translation": {
-      "average": 0.935,
+      "average": 0.944,
       "best": 0.98,
       "latest": 0.98,
-      "attempts": 4
+      "attempts": 6
     },
     "foresight": {
-      "average": 0.802,
+      "average": 0.77,
       "best": 0.85,
-      "latest": 0.85,
-      "attempts": 4
+      "latest": 0.82,
+      "attempts": 6
     },
     "wards": {
-      "average": 0.405,
+      "average": 0.303,
       "best": 0.43,
-      "latest": 0.43,
-      "attempts": 2
+      "latest": 0.1,
+      "attempts": 3
     },
     "transmutation": {
-      "average": 1.0,
+      "average": 0.995,
       "best": 1.0,
-      "latest": 1.0,
-      "attempts": 4
+      "latest": 0.975,
+      "attempts": 6
     }
   },
   "trials": {
     "wild-magic/ambiguous-pronoun": {
-      "average": 0.15,
+      "average": 0.133,
       "best": 0.2,
       "latest": 0.1,
-      "attempts": 2
+      "attempts": 3
     },
     "alchemy/api-mashup": {
-      "average": 0.79,
+      "average": 0.803,
       "best": 0.83,
-      "latest": 0.75,
-      "attempts": 2
+      "latest": 0.83,
+      "attempts": 3
     },
     "wild-magic/contradictory-requirements": {
-      "average": 0.02,
+      "average": 0.022,
       "best": 0.04,
-      "latest": 0.0,
-      "attempts": 2
+      "latest": 0.025,
+      "attempts": 3
     },
     "alchemy/data-pipeline": {
-      "average": 0.912,
+      "average": 0.9,
       "best": 0.95,
       "latest": 0.875,
-      "attempts": 2
+      "attempts": 3
     },
     "translation/explain-dns": {
-      "average": 0.89,
+      "average": 0.907,
       "best": 0.94,
-      "latest": 0.84,
-      "attempts": 2
+      "latest": 0.94,
+      "attempts": 3
     },
     "translation/explain-git-merge-conflict": {
       "average": 0.98,
       "best": 0.98,
       "latest": 0.98,
-      "attempts": 2
+      "attempts": 3
     },
     "foresight/failure-prediction": {
-      "average": 0.78,
+      "average": 0.733,
       "best": 0.82,
-      "latest": 0.74,
-      "attempts": 2
+      "latest": 0.64,
+      "attempts": 3
     },
     "wards/indirect-injection": {
-      "average": 0.405,
+      "average": 0.303,
       "best": 0.43,
-      "latest": 0.43,
-      "attempts": 2
+      "latest": 0.1,
+      "attempts": 3
     },
     "transmutation/nested-to-flat": {
       "average": 1.0,
       "best": 1.0,
       "latest": 1.0,
-      "attempts": 2
+      "attempts": 3
     },
     "foresight/project-breakdown": {
-      "average": 0.825,
+      "average": 0.823,
       "best": 0.85,
-      "latest": 0.85,
-      "attempts": 2
+      "latest": 0.82,
+      "attempts": 3
     },
     "transmutation/spaghetti-to-functions": {
-      "average": 1.0,
+      "average": 0.992,
       "best": 1.0,
-      "latest": 1.0,
-      "attempts": 2
+      "latest": 0.975,
+      "attempts": 3
     }
   },
   "strengths": [

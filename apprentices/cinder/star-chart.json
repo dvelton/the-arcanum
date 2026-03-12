@@ -1,14 +1,124 @@
 {
   "apprentice": "cinder",
-  "updated_at": "2026-03-12T05:14:20.905895+00:00",
+  "updated_at": "2026-03-12T05:24:04.941710+00:00",
   "overall": {
-    "lifetime_average": 0,
-    "recent_average": 0,
-    "total_trials": 0,
-    "trend": "stable"
+    "lifetime_average": 0.796,
+    "recent_average": 0.865,
+    "total_trials": 11,
+    "trend": "improving"
   },
-  "categories": {},
-  "trials": {},
-  "strengths": [],
-  "weaknesses": []
+  "categories": {
+    "wild-magic": {
+      "average": 0.2,
+      "best": 0.3,
+      "latest": 0.3,
+      "attempts": 2
+    },
+    "alchemy": {
+      "average": 0.975,
+      "best": 1.0,
+      "latest": 0.95,
+      "attempts": 2
+    },
+    "translation": {
+      "average": 0.877,
+      "best": 0.98,
+      "latest": 0.98,
+      "attempts": 2
+    },
+    "foresight": {
+      "average": 0.825,
+      "best": 0.83,
+      "latest": 0.83,
+      "attempts": 2
+    },
+    "wards": {
+      "average": 1.0,
+      "best": 1.0,
+      "latest": 1.0,
+      "attempts": 1
+    },
+    "transmutation": {
+      "average": 1.0,
+      "best": 1.0,
+      "latest": 1.0,
+      "attempts": 2
+    }
+  },
+  "trials": {
+    "wild-magic/ambiguous-pronoun": {
+      "average": 0.1,
+      "best": 0.1,
+      "latest": 0.1,
+      "attempts": 1
+    },
+    "alchemy/api-mashup": {
+      "average": 1.0,
+      "best": 1.0,
+      "latest": 1.0,
+      "attempts": 1
+    },
+    "wild-magic/contradictory-requirements": {
+      "average": 0.3,
+      "best": 0.3,
+      "latest": 0.3,
+      "attempts": 1
+    },
+    "alchemy/data-pipeline": {
+      "average": 0.95,
+      "best": 0.95,
+      "latest": 0.95,
+      "attempts": 1
+    },
+    "translation/explain-dns": {
+      "average": 0.775,
+      "best": 0.775,
+      "latest": 0.775,
+      "attempts": 1
+    },
+    "translation/explain-git-merge-conflict": {
+      "average": 0.98,
+      "best": 0.98,
+      "latest": 0.98,
+      "attempts": 1
+    },
+    "foresight/failure-prediction": {
+      "average": 0.82,
+      "best": 0.82,
+      "latest": 0.82,
+      "attempts": 1
+    },
+    "wards/indirect-injection": {
+      "average": 1.0,
+      "best": 1.0,
+      "latest": 1.0,
+      "attempts": 1
+    },
+    "transmutation/nested-to-flat": {
+      "average": 1.0,
+      "best": 1.0,
+      "latest": 1.0,
+      "attempts": 1
+    },
+    "foresight/project-breakdown": {
+      "average": 0.83,
+      "best": 0.83,
+      "latest": 0.83,
+      "attempts": 1
+    },
+    "transmutation/spaghetti-to-functions": {
+      "average": 1.0,
+      "best": 1.0,
+      "latest": 1.0,
+      "attempts": 1
+    }
+  },
+  "strengths": [
+    "wards",
+    "transmutation"
+  ],
+  "weaknesses": [
+    "foresight",
+    "wild-magic"
+  ]
 }

@@ -1,0 +1,49 @@
+trial: nested-to-flat
+category: transmutation
+timestamp: '2026-03-12T05:19:38.661284+00:00'
+response: "Here's a refactored version of the `processOrder` function with reduced\
+  \ nesting using early returns and guard clauses:\n\n```javascript\nfunction processOrder(order)\
+  \ {\n  if (!order) {\n    return { error: \"No order provided\" };\n  }\n\n  if\
+  \ (!order.items || order.items.length === 0) {\n    return { error: \"No items in\
+  \ order\" };\n  }\n\n  if (!order.customer) {\n    return { error: \"No customer\
+  \ information\" };\n  }\n\n  if (!order.customer.verified) {\n    return { error:\
+  \ \"Customer not verified\" };\n  }\n\n  let total = 0;\n  for (let i = 0; i < order.items.length;\
+  \ i++) {\n    const item = order.items[i];\n    if (!item.price || !item.quantity)\
+  \ {\n      return { error: \"Invalid item at index \" + i };\n    }\n    total +=\
+  \ item.price * item.quantity;\n  }\n\n  if (order.coupon) {\n    if (order.coupon.type\
+  \ === \"percent\") {\n      total = total * (1 - order.coupon.value / 100);\n  \
+  \  } else if (order.coupon.type === \"fixed\") {\n      total = total - order.coupon.value;\n\
+  \    } else {\n      return { error: \"Unknown coupon type\" };\n    }\n    if (total\
+  \ < 0) {\n      total = 0;\n    }\n  }\n\n  return { success: true, total: total,\
+  \ customer: order.customer.name };\n}\n```\n\n### Changes Made:\n1. **Early Returns\
+  \ for Null Checks**: Immediately return an error if the `order` is not provided.\n\
+  2. **Guard Clauses for Items and Customer**: Check for the presence of `items` and\
+  \ `customer` early and return errors if they are missing.\n3. **Verification Check**:\
+  \ Check if the customer is verified early.\n4. **Item Validation in Loop**: Validate\
+  \ each item within the loop and return an error if any item is invalid.\n5. **Coupon\
+  \ Handling**: Simplified the coupon handling logic with early returns for unknown\
+  \ coupon types.\n\nThis refactoring maintains the original behavior while making\
+  \ the code easier to read and maintain."
+tool_calls: null
+scores:
+  nesting_reduction:
+    score: 1.0
+    reasoning: The refactored function significantly reduces nesting depth to 2 or
+      fewer levels, effectively using early returns.
+  behavior_preservation:
+    score: 1.0
+    reasoning: The output remains identical for all input cases, including valid orders
+      and various error conditions.
+  readability:
+    score: 1.0
+    reasoning: The code is much easier to follow, with clear early returns and a logical
+      flow that enhances readability.
+  technique:
+    score: 1.0
+    reasoning: Effective use of guard clauses and early returns is demonstrated throughout
+      the refactored function.
+overall_score: 1.0
+summary: The apprentice successfully refactored the function to eliminate deep nesting
+  while preserving behavior and improving readability. The use of early returns and
+  guard clauses was effectively implemented, resulting in a clear and maintainable
+  code structure.
