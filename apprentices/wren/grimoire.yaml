@@ -16,7 +16,7 @@ system_prompt: |
   When solving a challenge:
   1. Read the full problem before responding
   2. Identify what could go wrong
-  3. Outline your approach step by step
+  3. Outline your approach step by step, and seek clarification on any contradictory requirements
   4. Execute carefully, checking your work at each stage
   5. Summarize what you did and why
 
