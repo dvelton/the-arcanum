@@ -1,0 +1,49 @@
+trial: nested-to-flat
+category: transmutation
+timestamp: '2026-03-16T06:45:57.872277+00:00'
+response: "Here's a refactored version of the `processOrder` function with reduced\
+  \ nesting and improved readability:\n\n```javascript\nfunction processOrder(order)\
+  \ {\n  // Guard clause: Check if order is provided\n  if (!order) {\n    return\
+  \ { error: \"No order provided\" };\n  }\n\n  // Check if order has items\n  if\
+  \ (!order.items || order.items.length === 0) {\n    return { error: \"No items in\
+  \ order\" };\n  }\n\n  // Check if order has a verified customer\n  if (!order.customer\
+  \ || !order.customer.verified) {\n    return { error: order.customer ? \"Customer\
+  \ not verified\" : \"No customer information\" };\n  }\n\n  // Calculate total cost\n\
+  \  let total = order.items.reduce((acc, item) => {\n    if (!item.price || !item.quantity)\
+  \ {\n      return acc; // Skip invalid items\n    }\n    return acc + item.price\
+  \ * item.quantity;\n  }, 0);\n\n  // Apply coupon (if any)\n  if (order.coupon)\
+  \ {\n    switch (order.coupon.type) {\n      case \"percent\":\n        total *=\
+  \ (1 - order.coupon.value / 100);\n        break;\n      case \"fixed\":\n     \
+  \   total -= order.coupon.value;\n        break;\n      default:\n        return\
+  \ { error: \"Unknown coupon type\" };\n    }\n    // Ensure total is not negative\n\
+  \    total = Math.max(total, 0);\n  }\n\n  // Return result\n  return { success:\
+  \ true, total, customer: order.customer.name };\n}\n```\n\nChanges made:\n\n1. Replaced\
+  \ multiple `if` statements with a single `if` statement and a guard clause to check\
+  \ if the order is provided.\n2. Used the `reduce` method to calculate the total\
+  \ cost, which eliminates the need for a `for` loop.\n3. Replaced the `if-else` chain\
+  \ for coupon types with a `switch` statement for better readability.\n4. Used early\
+  \ returns to simplify the function and reduce nesting.\n5. Improved code organization\
+  \ and added comments for better understanding.\n\nThis refactored version maintains\
+  \ the same behavior as the original function and is more concise and readable."
+tool_calls: null
+scores:
+  nesting_reduction:
+    score: 1.0
+    reasoning: The refactored function significantly reduces nesting, achieving a
+      maximum depth of 2, which aligns with the goal of flattening the structure.
+  behavior_preservation:
+    score: 1.0
+    reasoning: The refactored function maintains identical behavior for all input
+      cases, including valid orders and various error conditions.
+  readability:
+    score: 1.0
+    reasoning: The code is easier to follow due to the use of guard clauses, comments,
+      and the `reduce` method, which enhances clarity.
+  technique:
+    score: 1.0
+    reasoning: Effective use of guard clauses and early returns is demonstrated, along
+      with a switch statement for coupon handling, showcasing good coding practices.
+overall_score: 1.0
+summary: The apprentice successfully refactored the function to reduce nesting, preserve
+  behavior, and improve readability using effective techniques. The response meets
+  all criteria of the rubric, resulting in a perfect score.

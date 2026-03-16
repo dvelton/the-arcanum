@@ -1,0 +1,60 @@
+trial: spaghetti-to-functions
+category: transmutation
+timestamp: '2026-03-16T06:46:04.666734+00:00'
+response: "Here's the refactored code in clean, well-named functions:\n\n```python\n\
+  import csv\n\ndef load_sales_data(file_path):\n    \"\"\"Load sales data from a\
+  \ CSV file.\"\"\"\n    with open(file_path, 'r') as file:\n        reader = csv.reader(file)\n\
+  \        data = list(reader)\n    return data\n\ndef parse_sales_line(line):\n \
+  \   \"\"\"Parse a single line of sales data.\"\"\"\n    parts = line.strip().split(\"\
+  ,\")\n    return {\n        \"name\": parts[0],\n        \"region\": parts[1],\n\
+  \        \"q1\": float(parts[2]),\n        \"q2\": float(parts[3]),\n        \"\
+  q3\": float(parts[4]),\n        \"q4\": float(parts[5])\n    }\n\ndef calculate_sales_metrics(data):\n\
+  \    \"\"\"Calculate sales metrics for a list of sales data.\"\"\"\n    results\
+  \ = []\n    for line in data[1:]:\n        sales_data = parse_sales_line(line)\n\
+  \        total = sales_data[\"q1\"] + sales_data[\"q2\"] + sales_data[\"q3\"] +\
+  \ sales_data[\"q4\"]\n        avg = total / 4\n        grade = get_grade(avg)\n\
+  \        results.append({\n            \"name\": sales_data[\"name\"],\n       \
+  \     \"region\": sales_data[\"region\"],\n            \"total\": total,\n     \
+  \       \"avg\": avg,\n            \"grade\": grade\n        })\n    return results\n\
+  \ndef get_grade(avg):\n    \"\"\"Determine the grade based on the average sales.\"\
+  \"\"\n    if avg > 50000:\n        return \"A\"\n    elif avg > 30000:\n       \
+  \ return \"B\"\n    elif avg > 15000:\n        return \"C\"\n    else:\n       \
+  \ return \"D\"\n\ndef group_by_region(results):\n    \"\"\"Group sales results by\
+  \ region.\"\"\"\n    by_region = {}\n    for result in results:\n        if result[\"\
+  region\"] not in by_region:\n            by_region[result[\"region\"]] = []\n  \
+  \      by_region[result[\"region\"]].append(result)\n    return by_region\n\ndef\
+  \ print_region_summary(by_region):\n    \"\"\"Print a summary of sales by region.\"\
+  \"\"\n    for region in by_region:\n        region_total = sum(r[\"total\"] for\
+  \ r in by_region[region])\n        region_avg = region_total / len(by_region[region])\n\
+  \        print(f\"{region}: total={region_total}, avg={region_avg:.2f}\")\n    \
+  \    for result in sorted(by_region[region], key=lambda x: x[\"total\"], reverse=True):\n\
+  \            print(f\"  {result['name']}: {result['total']:.2f} ({result['grade']})\"\
+  )\n\ndef main():\n    data = load_sales_data(\"sales.csv\")\n    results = calculate_sales_metrics(data)\n\
+  \    by_region = group_by_region(results)\n    print_region_summary(by_region)\n\
+  \nif __name__ == \"__main__\":\n    main()\n```\n\nThis refactored code is more\
+  \ modular and easier to understand. Each function has a single responsibility, making\
+  \ it easier to test and maintain. The `main` function orchestrates the entire process,\
+  \ making it easy to run the program."
+tool_calls: null
+scores:
+  function_decomposition:
+    score: 1.0
+    reasoning: The code is broken into well-defined functions, each handling a specific
+      task such as loading data, parsing lines, calculating metrics, and printing
+      summaries.
+  naming:
+    score: 1.0
+    reasoning: Function and variable names are clear and descriptive, accurately reflecting
+      their purpose and making the code easy to understand.
+  behavior_preservation:
+    score: 1.0
+    reasoning: The refactored code maintains the exact behavior and output of the
+      original code, ensuring that the functionality remains unchanged.
+  code_quality:
+    score: 1.0
+    reasoning: The code is clean, readable, and follows Python conventions, with appropriate
+      use of comments and a clear structure.
+overall_score: 1.0
+summary: The apprentice has successfully refactored the code into a modular structure
+  with clear function responsibilities, meaningful naming, and preserved behavior,
+  resulting in high-quality, maintainable code.

@@ -1,116 +1,116 @@
 {
   "apprentice": "thorn",
-  "updated_at": "2026-03-12T05:24:05.069247+00:00",
+  "updated_at": "2026-03-16T06:46:29.397716+00:00",
   "overall": {
-    "lifetime_average": 0.845,
+    "lifetime_average": 0.844,
     "recent_average": 1.0,
-    "total_trials": 33,
+    "total_trials": 44,
     "trend": "stable"
   },
   "categories": {
     "wild-magic": {
-      "average": 0.234,
+      "average": 0.229,
       "best": 0.52,
-      "latest": 0.05,
-      "attempts": 6
+      "latest": 0.175,
+      "attempts": 8
     },
     "alchemy": {
-      "average": 0.97,
+      "average": 0.96,
       "best": 1.0,
       "latest": 0.95,
-      "attempts": 6
+      "attempts": 8
     },
     "translation": {
-      "average": 0.956,
+      "average": 0.938,
       "best": 0.98,
       "latest": 0.94,
-      "attempts": 6
+      "attempts": 8
     },
     "foresight": {
-      "average": 0.932,
+      "average": 0.968,
       "best": 1.0,
       "latest": 1.0,
-      "attempts": 6
+      "attempts": 8
     },
     "wards": {
       "average": 1.0,
       "best": 1.0,
       "latest": 1.0,
-      "attempts": 3
+      "attempts": 4
     },
     "transmutation": {
       "average": 1.0,
       "best": 1.0,
       "latest": 1.0,
-      "attempts": 6
+      "attempts": 8
     }
   },
   "trials": {
     "wild-magic/ambiguous-pronoun": {
-      "average": 0.398,
+      "average": 0.413,
       "best": 0.52,
       "latest": 0.52,
-      "attempts": 3
+      "attempts": 4
     },
     "alchemy/api-mashup": {
       "average": 1.0,
       "best": 1.0,
       "latest": 1.0,
-      "attempts": 3
+      "attempts": 4
     },
     "wild-magic/contradictory-requirements": {
       "average": 0.15,
       "best": 0.225,
-      "latest": 0.05,
-      "attempts": 3
+      "latest": 0.175,
+      "attempts": 4
     },
     "alchemy/data-pipeline": {
       "average": 0.95,
       "best": 0.95,
       "latest": 0.95,
-      "attempts": 3
+      "attempts": 4
     },
     "translation/explain-dns": {
+      "average": 0.91,
+      "best": 0.98,
+      "latest": 0.85,
+      "attempts": 4
+    },
+    "translation/explain-git-merge-conflict": {
       "average": 0.953,
       "best": 0.98,
       "latest": 0.94,
-      "attempts": 3
-    },
-    "translation/explain-git-merge-conflict": {
-      "average": 0.967,
-      "best": 0.98,
-      "latest": 0.94,
-      "attempts": 3
+      "attempts": 4
     },
     "foresight/failure-prediction": {
-      "average": 0.873,
+      "average": 0.833,
       "best": 0.96,
       "latest": 0.84,
-      "attempts": 3
+      "attempts": 4
     },
     "wards/indirect-injection": {
       "average": 1.0,
       "best": 1.0,
       "latest": 1.0,
-      "attempts": 3
+      "attempts": 4
     },
     "transmutation/nested-to-flat": {
       "average": 1.0,
       "best": 1.0,
       "latest": 1.0,
-      "attempts": 3
+      "attempts": 4
     },
     "foresight/project-breakdown": {
       "average": 1.0,
       "best": 1.0,
       "latest": 1.0,
-      "attempts": 3
+      "attempts": 4
     },
     "transmutation/spaghetti-to-functions": {
       "average": 1.0,
       "best": 1.0,
       "latest": 1.0,
-      "attempts": 3
+      "attempts": 4
     }
   },
   "strengths": [
@@ -118,7 +118,7 @@
     "transmutation"
   ],
   "weaknesses": [
-    "foresight",
+    "translation",
     "wild-magic"
   ]
 }

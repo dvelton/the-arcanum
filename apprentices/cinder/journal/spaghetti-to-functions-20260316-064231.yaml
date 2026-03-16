@@ -1,0 +1,66 @@
+trial: spaghetti-to-functions
+category: transmutation
+timestamp: '2026-03-16T06:42:31.083112+00:00'
+response: "Here's the refactored code:\n\n```python\ndef load_sales_data(file_path):\n\
+  \    with open(file_path, \"r\") as file:\n        return file.readlines()\n\ndef\
+  \ parse_line(line):\n    parts = line.strip().split(\",\")\n    return {\n     \
+  \   \"name\": parts[0],\n        \"region\": parts[1],\n        \"q1\": float(parts[2]),\n\
+  \        \"q2\": float(parts[3]),\n        \"q3\": float(parts[4]),\n        \"\
+  q4\": float(parts[5]),\n    }\n\ndef calculate_totals_and_grade(sale):\n    total\
+  \ = sum(sale.values())[2:]\n    avg = total / 4\n    grade = determine_grade(avg)\n\
+  \    return {\"total\": total, \"avg\": avg, \"grade\": grade}\n\ndef determine_grade(avg):\n\
+  \    if avg > 50000:\n        return \"A\"\n    elif avg > 30000:\n        return\
+  \ \"B\"\n    elif avg > 15000:\n        return \"C\"\n    else:\n        return\
+  \ \"D\"\n\ndef process_sales_data(data):\n    results = []\n    for line in data[1:]:\n\
+  \        sale = parse_line(line)\n        totals = calculate_totals_and_grade(sale)\n\
+  \        results.append({**sale, **totals})\n    return results\n\ndef group_by_region(results):\n\
+  \    by_region = {}\n    for r in results:\n        if r[\"region\"] not in by_region:\n\
+  \            by_region[r[\"region\"]] = []\n        by_region[r[\"region\"]].append(r)\n\
+  \    return by_region\n\ndef calculate_region_totals(by_region):\n    region_totals\
+  \ = {}\n    for region, sales in by_region.items():\n        region_total = sum(sale[\"\
+  total\"] for sale in sales)\n        region_avg = region_total / len(sales)\n  \
+  \      region_totals[region] = {\"total\": region_total, \"avg\": region_avg}\n\
+  \    return region_totals\n\ndef print_region_results(region, sales, region_totals):\n\
+  \    print(f\"{region}: total={region_totals['total']}, avg={region_totals['avg']:.2f}\"\
+  )\n    for sale in sorted(sales, key=lambda x: x[\"total\"], reverse=True):\n  \
+  \      print(f\"  {sale['name']}: {sale['total']:.2f} ({sale['grade']})\")\n\ndef\
+  \ main():\n    data = load_sales_data(\"sales.csv\")\n    results = process_sales_data(data)\n\
+  \    by_region = group_by_region(results)\n    region_totals = calculate_region_totals(by_region)\n\
+  \n    for region, sales in by_region.items():\n        print_region_results(region,\
+  \ sales, region_totals[region])\n\nif __name__ == \"__main__\":\n    main()\n```\n\
+  \n### Changes Made:\n\n1. **Function Extraction**: Broke down the code into smaller,\
+  \ well-named functions.\n2. **Data Loading**: Created `load_sales_data` to handle\
+  \ file reading.\n3. **Line Parsing**: Created `parse_line` to handle the parsing\
+  \ of each line.\n4. **Calculation Logic**: Created `calculate_totals_and_grade`\
+  \ to handle the calculation of totals and grades.\n5. **Grade Determination**: Created\
+  \ `determine_grade` to handle the logic for determining the grade.\n6. **Data Processing**:\
+  \ Created `process_sales_data` to process the sales data.\n7. **Grouping by Region**:\
+  \ Created `group_by_region` to group the results by region.\n8. **Region Totals\
+  \ Calculation**: Created `calculate_region_totals` to calculate the totals and averages\
+  \ for each region.\n9. **Printing Results**: Created `print_region_results` to handle\
+  \ the printing of the results.\n10. **Main Function**: Created `main` to orchestrate\
+  \ the flow of the program.\n\nThis refactoring improves readability and maintainability\
+  \ by breaking down the code into smaller, more manageable functions."
+tool_calls: null
+scores:
+  function_decomposition:
+    score: 1.0
+    reasoning: The code is broken down into well-defined functions that each handle
+      a specific task, adhering to the principle of separation of concerns.
+  naming:
+    score: 1.0
+    reasoning: Function and variable names are clear and descriptive, accurately reflecting
+      their purpose and improving code readability.
+  behavior_preservation:
+    score: 1.0
+    reasoning: The refactored code maintains the exact behavior and output of the
+      original code, ensuring that the functionality remains unchanged.
+  code_quality:
+    score: 1.0
+    reasoning: The refactored code is clean, readable, and follows Python conventions,
+      making it easy to understand and maintain.
+overall_score: 1.0
+summary: The apprentice has successfully refactored the provided code into a well-structured
+  format with clear function definitions and meaningful names, while preserving the
+  original behavior and adhering to coding standards. This demonstrates a strong understanding
+  of code organization and readability.

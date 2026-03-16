@@ -1,0 +1,57 @@
+trial: spaghetti-to-functions
+category: transmutation
+timestamp: '2026-03-16T06:44:31.659837+00:00'
+response: "Here's the refactored Python code with clean, well-named functions while\
+  \ maintaining the original behavior:\n\n```python\ndef read_sales_data(file_path):\n\
+  \    with open(file_path) as file:\n        return file.readlines()\n\ndef parse_sales_line(line):\n\
+  \    parts = line.strip().split(\",\")\n    name = parts[0]\n    region = parts[1]\n\
+  \    sales = list(map(float, parts[2:6]))  # Convert quarterly sales to floats\n\
+  \    return name, region, sales\n\ndef calculate_totals_and_grades(sales):\n   \
+  \ total = sum(sales)\n    avg = total / len(sales)\n    grade = determine_grade(avg)\n\
+  \    return total, avg, grade\n\ndef determine_grade(avg):\n    if avg > 50000:\n\
+  \        return \"A\"\n    elif avg > 30000:\n        return \"B\"\n    elif avg\
+  \ > 15000:\n        return \"C\"\n    else:\n        return \"D\"\n\ndef aggregate_by_region(results):\n\
+  \    by_region = {}\n    for result in results:\n        region = result[\"region\"\
+  ]\n        if region not in by_region:\n            by_region[region] = []\n   \
+  \     by_region[region].append(result)\n    return by_region\n\ndef print_region_summary(by_region):\n\
+  \    for region, records in by_region.items():\n        region_total = sum(record[\"\
+  total\"] for record in records)\n        region_avg = region_total / len(records)\n\
+  \        print(f\"{region}: total={region_total}, avg={region_avg:.2f}\")\n    \
+  \    for record in sorted(records, key=lambda x: x[\"total\"], reverse=True):\n\
+  \            print(f\"  {record['name']}: {record['total']:.2f} ({record['grade']})\"\
+  )\n\ndef main():\n    data = read_sales_data(\"sales.csv\")\n    results = []\n\
+  \    \n    for line in data[1:]:\n        name, region, sales = parse_sales_line(line)\n\
+  \        total, avg, grade = calculate_totals_and_grades(sales)\n        results.append({\"\
+  name\": name, \"region\": region, \"total\": total, \"avg\": avg, \"grade\": grade})\n\
+  \n    by_region = aggregate_by_region(results)\n    print_region_summary(by_region)\n\
+  \nif __name__ == \"__main__\":\n    main()\n```\n\n### Explanation of Changes:\n\
+  1. **Function Separation**: The code is broken down into distinct functions, each\
+  \ responsible for a specific task, improving readability and maintainability.\n\
+  2. **Descriptive Naming**: Functions are named to clearly indicate their purpose,\
+  \ making the code easier to understand.\n3. **Data Handling**: The parsing and calculations\
+  \ are encapsulated in their respective functions, which helps isolate changes and\
+  \ debugging.\n4. **Main Function**: A `main()` function is introduced to encapsulate\
+  \ the execution flow, following best practices for Python scripts. \n\nThis refactored\
+  \ code retains the original functionality while enhancing clarity and structure."
+tool_calls: null
+scores:
+  function_decomposition:
+    score: 1.0
+    reasoning: The code is effectively broken down into well-defined functions, each
+      handling a specific task, which enhances modularity.
+  naming:
+    score: 1.0
+    reasoning: Function and variable names are clear and descriptive, accurately reflecting
+      their purpose and improving code readability.
+  behavior_preservation:
+    score: 1.0
+    reasoning: The refactored code maintains the exact behavior and output of the
+      original code, ensuring that functionality is preserved.
+  code_quality:
+    score: 1.0
+    reasoning: The code follows Python conventions, is clean, and is structured in
+      a way that enhances readability and maintainability.
+overall_score: 1.0
+summary: The apprentice has successfully refactored the code into a well-structured
+  format with clear function separation, meaningful naming, and preserved behavior,
+  resulting in high-quality Python code.
